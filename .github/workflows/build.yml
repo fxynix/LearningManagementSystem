@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - jdbc
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
