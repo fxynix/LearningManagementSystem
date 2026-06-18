@@ -76,6 +76,8 @@ CREATE TABLE tests (
     course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
     title VARCHAR(200) NOT NULL,
     description TEXT,
+    content TEXT NOT NULL,
+    questions_count INTEGER NOT NULL,
     start_date TIMESTAMP NULL,
     end_date TIMESTAMP NULL,
     max_duration_minutes INTEGER NULL,
