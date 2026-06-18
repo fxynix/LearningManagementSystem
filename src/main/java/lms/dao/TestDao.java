@@ -14,17 +14,20 @@ import lms.models.Test;
 public class TestDao {
 
     public void create(Test test) throws SQLException {
-        String sql = "INSERT INTO tests (course_id, title, description, start_date, end_date, "
-                + "max_duration_minutes, max_attempts) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tests (course_id, title, description, content, questions_count, "
+                + "start_date, end_date, max_duration_minutes, max_attempts) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, test.getCourseId());
             stmt.setString(2, test.getTitle());
             stmt.setString(3, test.getDescription());
-            stmt.setObject(4, test.getStartDate(), Types.TIMESTAMP);
-            stmt.setObject(5, test.getEndDate(), Types.TIMESTAMP);
-            stmt.setObject(6, test.getMaxDurationMinutes(), Types.INTEGER);
-            stmt.setObject(7, test.getMaxAttempts(), Types.INTEGER);
+            stmt.setString(4, test.getContent());
+            stmt.setInt(5, test.getQuestionsCount());
+            stmt.setObject(6, test.getStartDate(), Types.TIMESTAMP);
+            stmt.setObject(7, test.getEndDate(), Types.TIMESTAMP);
+            stmt.setObject(8, test.getMaxDurationMinutes(), Types.INTEGER);
+            stmt.setObject(9, test.getMaxAttempts(), Types.INTEGER);
             stmt.executeUpdate();
             try (ResultSet keys = stmt.getGeneratedKeys()) {
                 if (keys.next()) {
@@ -77,18 +80,21 @@ public class TestDao {
     }
 
     public void update(Test test) throws SQLException {
-        String sql = "UPDATE tests SET course_id=?, title=?, description=?, start_date=?, "
-                + "end_date=?,  max_duration_minutes=?, max_attempts=? WHERE id=?";
+        String sql = "UPDATE tests SET course_id=?, title=?, description=?, content=?, "
+                + "questions_count=?, start_date=?, end_date=?, max_duration_minutes=?, "
+                + "max_attempts=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, test.getCourseId());
             stmt.setString(2, test.getTitle());
             stmt.setString(3, test.getDescription());
-            stmt.setObject(4, test.getStartDate(), Types.TIMESTAMP);
-            stmt.setObject(5, test.getEndDate(), Types.TIMESTAMP);
-            stmt.setObject(6, test.getMaxDurationMinutes(), Types.INTEGER);
-            stmt.setObject(7, test.getMaxAttempts(), Types.INTEGER);
-            stmt.setInt(8, test.getId());
+            stmt.setString(4, test.getContent());
+            stmt.setInt(5, test.getQuestionsCount());
+            stmt.setObject(6, test.getStartDate(), Types.TIMESTAMP);
+            stmt.setObject(7, test.getEndDate(), Types.TIMESTAMP);
+            stmt.setObject(8, test.getMaxDurationMinutes(), Types.INTEGER);
+            stmt.setObject(9, test.getMaxAttempts(), Types.INTEGER);
+            stmt.setInt(10, test.getId());
             stmt.executeUpdate();
         }
     }
@@ -108,6 +114,8 @@ public class TestDao {
         test.setCourseId(rs.getInt("course_id"));
         test.setTitle(rs.getString("title"));
         test.setDescription(rs.getString("description"));
+        test.setContent(rs.getString("content"));
+        test.setQuestionsCount(rs.getInt("questions_count"));
         test.setStartDate(rs.getString("start_date"));
         test.setEndDate(rs.getString("end_date"));
         test.setMaxDurationMinutes((Integer) rs.getObject("max_duration_minutes"));

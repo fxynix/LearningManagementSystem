@@ -94,8 +94,8 @@ public class TestAttemptDao {
     }
 
     public void update(TestAttempt attempt) throws SQLException {
-        String sql = "UPDATE test_attempts SET test_id=?, user_id=?, attempt_number=?, start_time=?, "
-                + "end_time=?, score=?, status=? WHERE id=?";
+        String sql = "UPDATE test_attempts SET test_id=?, user_id=?, attempt_number=?, "
+                + "start_time=?, end_time=?, score=?, status=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, attempt.getTestId());

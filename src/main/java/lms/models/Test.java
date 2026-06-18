@@ -12,6 +12,8 @@ public class Test {
     private int courseId;
     private String title;
     private String description;
+    private String content;
+    private int questionsCount;
     private String startDate;
     private String endDate;
     private Integer maxDurationMinutes;
