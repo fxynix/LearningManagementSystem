@@ -30,9 +30,12 @@ public class RoleService {
                 .orElseThrow(() -> new NotFoundException("Роль с ID " + id + " не найдена"));
     }
 
-    public Role getRoleByName(String name) {
-        return roleRepository.findByName(name)
-                .orElseThrow(() -> new NotFoundException("Роль с именем " + name + " не найдена"));
+    public List<Role> getRolesByName(String name) {
+        List<Role> roles = roleRepository.findByNameContaining(name);
+        if (roles.isEmpty()) {
+            throw new NotFoundException("Роли с названием '" + name + "' не найдены");
+        }
+        return roles;
     }
 
     public Role createRole(RoleCreateDto dto) {

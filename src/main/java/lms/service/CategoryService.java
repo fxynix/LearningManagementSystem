@@ -30,6 +30,14 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException("Категория с ID " + id + " не найдена"));
     }
 
+    public List<Category> getCategoriesByTitle(String name) {
+        List<Category> categories = categoryRepository.findByNameContaining(name);
+        if (categories.isEmpty()) {
+            throw new NotFoundException("Категории с названием '" + name + "' не найденo");
+        }
+        return categories;
+    }
+
     public Category createCategory(CategoryCreateDto dto) {
         Category category = new Category();
         category.setName(dto.getName());

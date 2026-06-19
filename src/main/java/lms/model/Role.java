@@ -1,5 +1,6 @@
 package lms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,8 +38,10 @@ public class Role {
     private LocalDateTime createdAt;
 
     @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
     private Set<User> users = new HashSet<>();
 
     @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
     private Set<Course> courses = new HashSet<>();
 }

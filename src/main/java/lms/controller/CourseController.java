@@ -1,0 +1,114 @@
+package lms.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import java.util.List;
+import lms.dto.create.CourseCreateDto;
+import lms.dto.update.CourseUpdateDto;
+import lms.model.Course;
+import lms.service.CourseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/courses")
+@Tag(name = "Course Controller", description = "API для управления курсами")
+public class CourseController {
+
+    private final CourseService courseService;
+
+    @Autowired
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
+    }
+
+    @GetMapping("{id}")
+    @Operation(summary = "Получить курс по ID")
+    @ApiResponse(responseCode = "200", description = "Курс найден")
+    @ApiResponse(responseCode = "404", description = "Курс не найден")
+    public ResponseEntity<Course> getCourseById(
+            @Parameter(description = "ID курса", example = "1")
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(courseService.getCourseById(id));
+    }
+
+    @GetMapping(params = "title")
+    @Operation(summary = "Получить курс(-ы) по названию")
+    @ApiResponse(responseCode = "200", description = "Курс найден")
+    @ApiResponse(responseCode = "404", description = "Курсов не найдено")
+    public ResponseEntity<List<Course>> getCourseByTitle(
+            @Parameter(description = "Название курса", example = "Java с нуля")
+            @RequestParam String title) {
+        return ResponseEntity.ok(courseService.getCoursesByTitle(title));
+    }
+
+    @GetMapping("/categoryId/{categoryId}")
+    @Operation(summary = "Получить курсы по ID категории")
+    @ApiResponse(responseCode = "200", description = "Курсы найдены")
+    public ResponseEntity<List<Course>> getCoursesByCategory(
+            @Parameter(description = "ID категории", example = "1")
+            @PathVariable Integer categoryId) {
+        return ResponseEntity.ok(courseService.getCoursesByCategory(categoryId));
+    }
+
+    @GetMapping("/teacherId/{teacherId}")
+    @Operation(summary = "Получить курсы по ID преподавателя")
+    @ApiResponse(responseCode = "200", description = "Курсы найдены")
+    public ResponseEntity<List<Course>> getCoursesByTeacher(
+            @Parameter(description = "ID преподавателя", example = "2")
+            @PathVariable Integer teacherId) {
+        return ResponseEntity.ok(courseService.getCoursesByTeacher(teacherId));
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Получить все курсы")
+    @ApiResponse(responseCode = "200", description = "Курсы найдены")
+    public ResponseEntity<List<Course>> getAllCourses() {
+        return ResponseEntity.ok(courseService.getAllCourses());
+    }
+
+    @PostMapping
+    @Operation(summary = "Создать курс")
+    @ApiResponse(responseCode = "201", description = "Курс создан")
+    @ApiResponse(responseCode = "400", description = "Некорректные данные")
+    public ResponseEntity<Course> createCourse(@Valid @RequestBody CourseCreateDto dto) {
+        Course created = courseService.createCourse(dto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "Обновить курс")
+    @ApiResponse(responseCode = "200", description = "Курс обновлён")
+    @ApiResponse(responseCode = "404", description = "Курс не найден")
+    @ApiResponse(responseCode = "400", description = "Некорректные данные")
+    public ResponseEntity<Course> updateCourse(
+            @Parameter(description = "ID курса", example = "1")
+            @PathVariable Integer id,
+            @Valid @RequestBody CourseUpdateDto dto) {
+        return ResponseEntity.ok(courseService.updateCourse(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить курс")
+    @ApiResponse(responseCode = "204", description = "Курс удалён")
+    @ApiResponse(responseCode = "404", description = "Курс не найден")
+    public ResponseEntity<Void> deleteCourse(
+            @Parameter(description = "ID курса", example = "1")
+            @PathVariable Integer id) {
+        courseService.deleteCourse(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}

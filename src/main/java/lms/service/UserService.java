@@ -36,10 +36,13 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id + " не найден"));
     }
 
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("Пользователь с логином " + username
-                        + " не найден"));
+    public  List<User> getUsersByUsername(String username) {
+        List<User> users = userRepository.findByUsernameContaining(username);
+        if (users.isEmpty()) {
+            throw new NotFoundException("Пользователей с никнеймом '" + users + "' не найдено");
+        }
+        return users;
+
     }
 
     public User createUser(UserCreateDto dto) {
@@ -80,8 +83,8 @@ public class UserService {
         if (dto.getRoleIds() != null) {
             Set<Role> roles = dto.getRoleIds().stream()
                     .map(roleId -> roleRepository.findById(roleId)
-                            .orElseThrow(() -> new NotFoundException("Роль с ID " + roleId
-                                    + " не найдена")))
+                            .orElseThrow(() -> new NotFoundException("Рoль с ID " + roleId
+                                    + " нe найдена")))
                     .collect(Collectors.toSet());
             user.setRoles(roles);
         }
@@ -92,34 +95,5 @@ public class UserService {
     public void deleteUser(Integer id) {
         User user = getUserById(id);
         userRepository.delete(user);
-    }
-
-    @Transactional
-    public void addRoleToUser(Integer userId, Integer roleId) {
-        User user = getUserById(userId);
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new NotFoundException("Роль с ID " + roleId + " не найдена"));
-        user.getRoles().add(role);
-        userRepository.save(user);
-    }
-
-    @Transactional
-    public void removeRoleFromUser(Integer userId, Integer roleId) {
-        User user = getUserById(userId);
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new NotFoundException("Роль с ID " + roleId + " не найдена"));
-        user.getRoles().remove(role);
-        userRepository.save(user);
-    }
-
-    public List<Role> getRolesOfUser(Integer userId) {
-        User user = getUserById(userId);
-        return List.copyOf(user.getRoles());
-    }
-
-    public List<User> getUsersByRole(Integer roleId) {
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new NotFoundException("Роль с ID " + roleId + " не найдена"));
-        return List.copyOf(role.getUsers());
     }
 }

@@ -34,6 +34,14 @@ public class TestService {
                 .orElseThrow(() -> new NotFoundException("Тест с ID " + id + " не найден"));
     }
 
+    public List<Test> getTestsByTitle(String title) {
+        List<Test> tests = testRepository.findByTitleContaining(title);
+        if (tests.isEmpty()) {
+            throw new NotFoundException("Тестов с названием '" + title + "' не найдено");
+        }
+        return tests;
+    }
+
     public List<Test> getTestsByCourse(Integer courseId) {
         return testRepository.findByCourseId(courseId);
     }
@@ -41,7 +49,7 @@ public class TestService {
     public Test createTest(TestCreateDto dto) {
         Course course = courseRepository.findById(dto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Курс с ID " + dto.getCourseId()
-                        + " не найден"));
+                        + " нe найдeн"));
 
         Test test = new Test();
         test.setCourse(course);
@@ -63,7 +71,7 @@ public class TestService {
         if (dto.getCourseId() != null) {
             Course course = courseRepository.findById(dto.getCourseId())
                     .orElseThrow(() -> new NotFoundException("Курс с ID " + dto.getCourseId()
-                            + " не найден"));
+                            + " не нaйден"));
             test.setCourse(course);
         }
         if (dto.getTitle() != null) {

@@ -34,6 +34,14 @@ public class LectureService {
                 .orElseThrow(() -> new NotFoundException("Лекция с ID " + id + " не найдена"));
     }
 
+    public List<Lecture> getLecturesByTitle(String title) {
+        List<Lecture> lectures = lectureRepository.findByTitleContaining(title);
+        if (lectures.isEmpty()) {
+            throw new NotFoundException("Лекции с названием '" + title + "' не найдены");
+        }
+        return lectures;
+    }
+
     public List<Lecture> getLecturesByCourse(Integer courseId) {
         return lectureRepository.findByCourseIdOrderByOrderNumber(courseId);
     }

@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface TestRepository extends JpaRepository<Test, Integer> {
 
     List<Test> findByCourseId(Integer courseId);
+
+    List<Test> findByTitleContaining(String title);
+
 }

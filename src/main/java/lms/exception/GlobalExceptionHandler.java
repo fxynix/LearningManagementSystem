@@ -1,6 +1,5 @@
 package lms.exception;
 
-import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;

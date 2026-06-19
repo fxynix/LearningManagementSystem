@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface LectureRepository extends JpaRepository<Lecture, Integer> {
 
     List<Lecture> findByCourseIdOrderByOrderNumber(Integer courseId);
+
+    List<Lecture> findByTitleContaining(String title);
+
 }

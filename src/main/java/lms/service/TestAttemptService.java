@@ -54,7 +54,7 @@ public class TestAttemptService {
                         + " не найден"));
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID "
-                        + dto.getUserId() + " не найден"));
+                        + dto.getUserId() + " нe найден"));
 
         TestAttempt attempt = new TestAttempt();
         attempt.setTest(test);
@@ -74,13 +74,13 @@ public class TestAttemptService {
         if (dto.getTestId() != null) {
             Test test = testRepository.findById(dto.getTestId())
                     .orElseThrow(() -> new NotFoundException("Тест с ID " + dto.getTestId()
-                            + " не найден"));
+                            + " не нaйден"));
             attempt.setTest(test);
         }
         if (dto.getUserId() != null) {
             User user = userRepository.findById(dto.getUserId())
                     .orElseThrow(() -> new NotFoundException("Пользователь с ID "
-                            + dto.getUserId() + " не найден"));
+                            + dto.getUserId() + " не найдeн"));
             attempt.setUser(user);
         }
         if (dto.getAttemptNumber() != null) {
