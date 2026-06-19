@@ -38,4 +38,4 @@ $$
 
 ## Swagger
 
-[Swagger](http://localhost:8080/swagger-ui/index.html)
+После запуска, документацию можно посмотреть yf [Swagger](http://localhost:8080/swagger-ui/index.html)
