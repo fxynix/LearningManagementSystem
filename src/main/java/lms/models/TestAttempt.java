@@ -16,5 +16,4 @@ public class TestAttempt {
     private String endTime;
     private Integer score;
     private String status;
-    private String createdAt;
 }

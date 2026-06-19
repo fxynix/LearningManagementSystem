@@ -129,7 +129,6 @@ public class TestAttemptDao {
         attempt.setEndTime(rs.getString("end_time"));
         attempt.setScore((Integer) rs.getObject("score"));
         attempt.setStatus(rs.getString("status"));
-        attempt.setCreatedAt(rs.getString("created_at"));
         return attempt;
     }
 }
