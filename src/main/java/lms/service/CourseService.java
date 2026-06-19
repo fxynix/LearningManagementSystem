@@ -1,0 +1,158 @@
+package lms.service;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lms.dto.create.CourseCreateDto;
+import lms.dto.update.CourseUpdateDto;
+import lms.exception.NotFoundException;
+import lms.model.Category;
+import lms.model.Course;
+import lms.model.Role;
+import lms.model.User;
+import lms.repository.CategoryRepository;
+import lms.repository.CourseRepository;
+import lms.repository.RoleRepository;
+import lms.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class CourseService {
+
+    private final CourseRepository courseRepository;
+    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+
+    @Autowired
+    public CourseService(CourseRepository courseRepository,
+                         CategoryRepository categoryRepository,
+                         UserRepository userRepository,
+                         RoleRepository roleRepository) {
+        this.courseRepository = courseRepository;
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
+
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
+    }
+
+    public Course getCourseById(Integer id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Курс с ID " + id + " не найден"));
+    }
+
+    public List<Course> getCoursesByCategory(Integer categoryId) {
+        return courseRepository.findByCategoryId(categoryId);
+    }
+
+    public List<Course> getCoursesByTeacher(Integer teacherId) {
+        return courseRepository.findByTeacherId(teacherId);
+    }
+
+    public Course createCourse(CourseCreateDto dto) {
+        Course course = new Course();
+        course.setTitle(dto.getTitle());
+        course.setDescription(dto.getDescription());
+
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Категория с ID "
+                            + dto.getCategoryId() + " не найдена"));
+            course.setCategory(category);
+        }
+
+        if (dto.getTeacherId() != null) {
+            User teacher = userRepository.findById(dto.getTeacherId())
+                    .orElseThrow(() -> new NotFoundException("Преподаватель с ID "
+                            + dto.getTeacherId() + " не найден"));
+            course.setTeacher(teacher);
+        }
+
+        if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
+            Set<Role> roles = dto.getRoleIds().stream()
+                    .map(roleId -> roleRepository.findById(roleId)
+                            .orElseThrow(() -> new NotFoundException("Роль с ID "
+                                    + roleId + " не найдена")))
+                    .collect(Collectors.toSet());
+            course.setRoles(roles);
+        }
+
+        return courseRepository.save(course);
+    }
+
+    public Course updateCourse(Integer id, CourseUpdateDto dto) {
+        Course course = getCourseById(id);
+
+        if (dto.getTitle() != null) {
+            course.setTitle(dto.getTitle());
+        }
+        if (dto.getDescription() != null) {
+            course.setDescription(dto.getDescription());
+        }
+
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Категория с ID "
+                            + dto.getCategoryId() + " не найдена"));
+            course.setCategory(category);
+        }
+
+        if (dto.getTeacherId() != null) {
+            User teacher = userRepository.findById(dto.getTeacherId())
+                    .orElseThrow(() -> new NotFoundException("Преподаватель с ID "
+                            + dto.getTeacherId() + " не найден"));
+            course.setTeacher(teacher);
+        }
+
+        if (dto.getRoleIds() != null) {
+            Set<Role> roles = dto.getRoleIds().stream()
+                    .map(roleId -> roleRepository.findById(roleId)
+                            .orElseThrow(() -> new NotFoundException("Роль с ID "
+                                    + roleId + " не найдена")))
+                    .collect(Collectors.toSet());
+            course.setRoles(roles);
+        }
+
+        return courseRepository.save(course);
+    }
+
+    public void deleteCourse(Integer id) {
+        Course course = getCourseById(id);
+        courseRepository.delete(course);
+    }
+
+    @Transactional
+    public void addRoleToCourse(Integer courseId, Integer roleId) {
+        Course course = getCourseById(courseId);
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new NotFoundException("Роль с ID " + roleId + " не найдена"));
+        course.getRoles().add(role);
+        courseRepository.save(course);
+    }
+
+    @Transactional
+    public void removeRoleFromCourse(Integer courseId, Integer roleId) {
+        Course course = getCourseById(courseId);
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new NotFoundException("Роль с ID " + roleId + " не найдена"));
+        course.getRoles().remove(role);
+        courseRepository.save(course);
+    }
+
+    public List<Role> getRolesOfCourse(Integer courseId) {
+        Course course = getCourseById(courseId);
+        return List.copyOf(course.getRoles());
+    }
+
+    public List<Course> getCoursesByRole(Integer roleId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new NotFoundException("Роль с ID " + roleId + " не найдена"));
+        return List.copyOf(role.getCourses());
+    }
+}
