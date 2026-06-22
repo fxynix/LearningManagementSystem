@@ -48,7 +48,7 @@ public class RoleController {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
-    @GetMapping
+    @GetMapping("/all_p")
     @Operation(summary = "Получить все роли (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Роли найдены")
     public ResponseEntity<Page<Role>> getAllRoles(

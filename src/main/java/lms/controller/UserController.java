@@ -48,7 +48,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @GetMapping
+    @GetMapping("/all_p")
     @Operation(summary = "Получить всех пользователей (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Пользователи найдены")
     public ResponseEntity<Page<User>> getAllUsers(

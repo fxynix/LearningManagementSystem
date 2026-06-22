@@ -38,7 +38,7 @@ public class LectureController {
         this.lectureService = lectureService;
     }
 
-    @GetMapping
+    @GetMapping("/all_p")
     @Operation(summary = "Получить все лекции (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Лекции найдены")
     public ResponseEntity<Page<Lecture>> getAllLectures(

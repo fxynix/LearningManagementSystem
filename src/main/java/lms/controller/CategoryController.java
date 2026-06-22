@@ -60,7 +60,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoriesByTitle(name, pageable));
     }
 
-    @GetMapping
+    @GetMapping("/all_p")
     @Operation(summary = "Получить все категории (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Категории найдены")
     public ResponseEntity<Page<Category>> getAllCategories(

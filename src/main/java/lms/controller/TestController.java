@@ -38,7 +38,7 @@ public class TestController {
         this.testService = testService;
     }
 
-    @GetMapping
+    @GetMapping("/all_p")
     @Operation(summary = "Получить все тесты (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Тесты найдены")
     public ResponseEntity<Page<Test>> getAllTests(

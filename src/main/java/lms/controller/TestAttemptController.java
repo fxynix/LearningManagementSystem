@@ -49,7 +49,7 @@ public class TestAttemptController {
         return ResponseEntity.ok(testAttemptService.getTestAttemptById(id));
     }
 
-    @GetMapping
+    @GetMapping("/all_p")
     @Operation(summary = "Получить все попытки (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Попытки найдены")
     public ResponseEntity<Page<TestAttempt>> getAllTestAttempts(

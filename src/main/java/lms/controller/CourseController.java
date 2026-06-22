@@ -48,7 +48,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    @GetMapping
+    @GetMapping("/all_p")
     @Operation(summary = "Получить все курсы (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Курсы найдены")
     public ResponseEntity<Page<Course>> getAllCourses(
