@@ -11,6 +11,8 @@ import lms.repository.TestAttemptRepository;
 import lms.repository.TestRepository;
 import lms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,21 +33,25 @@ public class TestAttemptService {
         this.userRepository = userRepository;
     }
 
-    public List<TestAttempt> getAllTestAttempts() {
+    public Page<TestAttempt> getAllTestAttempts(Pageable pageable) {
+        return testAttemptRepository.findAll(pageable);
+    }
+
+    public Page<TestAttempt> getTestAttemptsByTest(Integer testId, Pageable pageable) {
+        return testAttemptRepository.findByTestId(testId, pageable);
+    }
+
+    public Page<TestAttempt> getTestAttemptsByUser(Integer userId, Pageable pageable) {
+        return testAttemptRepository.findByUserId(userId, pageable);
+    }
+
+    public List<TestAttempt> getAllTestAttemptsList() {
         return testAttemptRepository.findAll();
     }
 
     public TestAttempt getTestAttemptById(Integer id) {
         return testAttemptRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Попытка с ID " + id + " не найдена"));
-    }
-
-    public List<TestAttempt> getTestAttemptsByTest(Integer testId) {
-        return testAttemptRepository.findByTestId(testId);
-    }
-
-    public List<TestAttempt> getTestAttemptsByUser(Integer userId) {
-        return testAttemptRepository.findByUserId(userId);
     }
 
     public TestAttempt createTestAttempt(TestAttemptCreateDto dto) {

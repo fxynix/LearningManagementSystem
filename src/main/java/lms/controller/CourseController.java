@@ -11,6 +11,10 @@ import lms.dto.update.CourseUpdateDto;
 import lms.model.Course;
 import lms.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -45,39 +48,54 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    @GetMapping(params = "title")
-    @Operation(summary = "Получить курс(-ы) по названию")
-    @ApiResponse(responseCode = "200", description = "Курс найден")
+    @GetMapping
+    @Operation(summary = "Получить все курсы (с пагинацией)")
+    @ApiResponse(responseCode = "200", description = "Курсы найдены")
+    public ResponseEntity<Page<Course>> getAllCourses(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(courseService.getAllCourses(pageable));
+    }
+
+    @GetMapping("title/{title}")
+    @Operation(summary = "Получить курсы по названию (с пагинацией)")
+    @ApiResponse(responseCode = "200", description = "Курсы найдены")
     @ApiResponse(responseCode = "404", description = "Курсов не найдено")
-    public ResponseEntity<List<Course>> getCourseByTitle(
-            @Parameter(description = "Название курса", example = "Java с нуля")
-            @RequestParam String title) {
-        return ResponseEntity.ok(courseService.getCoursesByTitle(title));
+    public ResponseEntity<Page<Course>> getCoursesByTitle(
+            @Parameter(description = "Название курса", example = "Java")
+            @PathVariable String title,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(courseService.getCoursesByTitle(title, pageable));
     }
 
-    @GetMapping("/categoryId/{categoryId}")
-    @Operation(summary = "Получить курсы по ID категории")
+    @GetMapping("categoryId/{categoryId}")
+    @Operation(summary = "Получить курсы по ID категории (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Курсы найдены")
-    public ResponseEntity<List<Course>> getCoursesByCategory(
+    public ResponseEntity<Page<Course>> getCoursesByCategory(
             @Parameter(description = "ID категории", example = "1")
-            @PathVariable Integer categoryId) {
-        return ResponseEntity.ok(courseService.getCoursesByCategory(categoryId));
+            @PathVariable Integer categoryId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(courseService.getCoursesByCategory(categoryId, pageable));
     }
 
-    @GetMapping("/teacherId/{teacherId}")
-    @Operation(summary = "Получить курсы по ID преподавателя")
+    @GetMapping("teacherId/{teacherId}")
+    @Operation(summary = "Получить курсы по ID преподавателя (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Курсы найдены")
-    public ResponseEntity<List<Course>> getCoursesByTeacher(
+    public ResponseEntity<Page<Course>> getCoursesByTeacher(
             @Parameter(description = "ID преподавателя", example = "2")
-            @PathVariable Integer teacherId) {
-        return ResponseEntity.ok(courseService.getCoursesByTeacher(teacherId));
+            @PathVariable Integer teacherId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(courseService.getCoursesByTeacher(teacherId, pageable));
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Получить все курсы")
+    @Operation(summary = "Получить все курсы (без пагинации)")
     @ApiResponse(responseCode = "200", description = "Курсы найдены")
-    public ResponseEntity<List<Course>> getAllCourses() {
-        return ResponseEntity.ok(courseService.getAllCourses());
+    public ResponseEntity<List<Course>> getAllCoursesNoPagination() {
+        return ResponseEntity.ok(courseService.getAllCoursesList());
     }
 
     @PostMapping

@@ -9,6 +9,8 @@ import lms.model.Lecture;
 import lms.repository.CourseRepository;
 import lms.repository.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,25 +27,25 @@ public class LectureService {
         this.courseRepository = courseRepository;
     }
 
-    public List<Lecture> getAllLectures() {
-        return lectureRepository.findAll();
-    }
-
     public Lecture getLectureById(Integer id) {
         return lectureRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Лекция с ID " + id + " не найдена"));
     }
 
-    public List<Lecture> getLecturesByTitle(String title) {
-        List<Lecture> lectures = lectureRepository.findByTitleContaining(title);
-        if (lectures.isEmpty()) {
-            throw new NotFoundException("Лекции с названием '" + title + "' не найдены");
-        }
-        return lectures;
+    public Page<Lecture> getAllLectures(Pageable pageable) {
+        return lectureRepository.findAll(pageable);
     }
 
-    public List<Lecture> getLecturesByCourse(Integer courseId) {
-        return lectureRepository.findByCourseIdOrderByOrderNumber(courseId);
+    public Page<Lecture> getLecturesByTitle(String title, Pageable pageable) {
+        return lectureRepository.findByTitleContaining(title, pageable);
+    }
+
+    public Page<Lecture> getLecturesByCourse(Integer courseId, Pageable pageable) {
+        return lectureRepository.findByCourseIdOrderByOrderNumber(courseId, pageable);
+    }
+
+    public List<Lecture> getAllLecturesList() {
+        return lectureRepository.findAll();
     }
 
     public Lecture createLecture(LectureCreateDto dto) {

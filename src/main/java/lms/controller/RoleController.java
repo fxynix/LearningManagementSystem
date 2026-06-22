@@ -11,6 +11,10 @@ import lms.dto.update.RoleUpdateDto;
 import lms.model.Role;
 import lms.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -45,21 +48,32 @@ public class RoleController {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
-    @GetMapping(params = "name")
-    @Operation(summary = "Получить роль(-и) по названию")
-    @ApiResponse(responseCode = "200", description = "Роль найдена")
+    @GetMapping
+    @Operation(summary = "Получить все роли (с пагинацией)")
+    @ApiResponse(responseCode = "200", description = "Роли найдены")
+    public ResponseEntity<Page<Role>> getAllRoles(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(roleService.getAllRoles(pageable));
+    }
+
+    @GetMapping("name/{name}")
+    @Operation(summary = "Получить роли по названию (с пагинацией)")
+    @ApiResponse(responseCode = "200", description = "Роли найдены")
     @ApiResponse(responseCode = "404", description = "Ролей не найдено")
-    public ResponseEntity<List<Role>> getRoleByName(
+    public ResponseEntity<Page<Role>> getRolesByName(
             @Parameter(description = "Название роли", example = "ADMIN")
-            @RequestParam String name) {
-        return ResponseEntity.ok(roleService.getRolesByName(name));
+            @PathVariable String name,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(roleService.getRolesByName(name, pageable));
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Получить все роли")
+    @Operation(summary = "Получить все роли (без пагинации)")
     @ApiResponse(responseCode = "200", description = "Роли найдены")
-    public ResponseEntity<List<Role>> getAllRoles() {
-        return ResponseEntity.ok(roleService.getAllRoles());
+    public ResponseEntity<List<Role>> getAllRolesNoPagination() {
+        return ResponseEntity.ok(roleService.getAllRolesList());
     }
 
     @PostMapping

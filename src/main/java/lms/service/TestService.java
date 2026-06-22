@@ -9,6 +9,8 @@ import lms.model.Test;
 import lms.repository.CourseRepository;
 import lms.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,25 +27,25 @@ public class TestService {
         this.courseRepository = courseRepository;
     }
 
-    public List<Test> getAllTests() {
+    public Page<Test> getAllTests(Pageable pageable) {
+        return testRepository.findAll(pageable);
+    }
+
+    public Page<Test> getTestsByTitle(String title, Pageable pageable) {
+        return testRepository.findByTitleContaining(title, pageable);
+    }
+
+    public Page<Test> getTestsByCourse(Integer courseId, Pageable pageable) {
+        return testRepository.findByCourseId(courseId, pageable);
+    }
+
+    public List<Test> getAllTestsList() {
         return testRepository.findAll();
     }
 
     public Test getTestById(Integer id) {
         return testRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Тест с ID " + id + " не найден"));
-    }
-
-    public List<Test> getTestsByTitle(String title) {
-        List<Test> tests = testRepository.findByTitleContaining(title);
-        if (tests.isEmpty()) {
-            throw new NotFoundException("Тестов с названием '" + title + "' не найдено");
-        }
-        return tests;
-    }
-
-    public List<Test> getTestsByCourse(Integer courseId) {
-        return testRepository.findByCourseId(courseId);
     }
 
     public Test createTest(TestCreateDto dto) {

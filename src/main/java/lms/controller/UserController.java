@@ -11,6 +11,10 @@ import lms.dto.update.UserUpdateDto;
 import lms.model.User;
 import lms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -45,21 +48,32 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @GetMapping(params = "username")
-    @Operation(summary = "Получить пользователя(-ей) по логину")
-    @ApiResponse(responseCode = "200", description = "Пользователь найден")
-    @ApiResponse(responseCode = "404", description = "Пользователей не найдено")
-    public ResponseEntity<List<User>> getUserByUsername(
-            @Parameter(description = "Логин пользователя", example = "ivan.petrov")
-            @RequestParam String username) {
-        return ResponseEntity.ok(userService.getUsersByUsername(username));
+    @GetMapping
+    @Operation(summary = "Получить всех пользователей (с пагинацией)")
+    @ApiResponse(responseCode = "200", description = "Пользователи найдены")
+    public ResponseEntity<Page<User>> getAllUsers(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
+    }
+
+    @GetMapping("username/{username}")
+    @Operation(summary = "Получить пользователей по логину (с пагинацией)")
+    @ApiResponse(responseCode = "200", description = "Пользователи найдены")
+    @ApiResponse(responseCode = "404", description = "Пользователи не найдены")
+    public ResponseEntity<Page<User>> getUsersByUsername(
+            @Parameter(description = "Логин пользователя (часть)", example = "ivan")
+            @PathVariable String username,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        return ResponseEntity.ok(userService.getUsersByUsername(username, pageable));
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Получить всех пользователей")
+    @Operation(summary = "Получить всех пользователей (без пагинации)")
     @ApiResponse(responseCode = "200", description = "Пользователи найдены")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<User>> getAllUsersNoPagination() {
+        return ResponseEntity.ok(userService.getAllUsersList());
     }
 
     @PostMapping

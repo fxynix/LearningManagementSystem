@@ -1,17 +1,17 @@
 package lms.repository;
 
-import java.util.List;
 import lms.model.Course;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 
-    List<Course> findByCategoryId(Integer categoryId);
+    Page<Course> findByCategoryId(Integer categoryId, Pageable pageable);
 
-    List<Course> findByTeacherId(Integer teacherId);
+    Page<Course> findByTeacherId(Integer teacherId, Pageable pageable);
 
-    List<Course> findByTitleContaining(String title);
+    Page<Course> findByTitleContaining(String title, Pageable pageable);
 }

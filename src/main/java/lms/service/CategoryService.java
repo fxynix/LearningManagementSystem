@@ -7,6 +7,8 @@ import lms.exception.NotFoundException;
 import lms.model.Category;
 import lms.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,11 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Category> getAllCategories() {
+    public Page<Category> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
+    }
+
+    public List<Category> getAllCategoriesList() {
         return categoryRepository.findAll();
     }
 
@@ -30,12 +36,8 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException("Категория с ID " + id + " не найдена"));
     }
 
-    public List<Category> getCategoriesByTitle(String name) {
-        List<Category> categories = categoryRepository.findByNameContaining(name);
-        if (categories.isEmpty()) {
-            throw new NotFoundException("Категории с названием '" + name + "' не найденo");
-        }
-        return categories;
+    public Page<Category> getCategoriesByTitle(String name, Pageable pageable) {
+        return categoryRepository.findByNameContaining(name, pageable);
     }
 
     public Category createCategory(CategoryCreateDto dto) {

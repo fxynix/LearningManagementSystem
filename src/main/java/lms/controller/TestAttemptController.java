@@ -11,6 +11,10 @@ import lms.dto.update.TestAttemptUpdateDto;
 import lms.model.TestAttempt;
 import lms.service.TestAttemptService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,29 +49,42 @@ public class TestAttemptController {
         return ResponseEntity.ok(testAttemptService.getTestAttemptById(id));
     }
 
-    @GetMapping("/testId/{testId}")
-    @Operation(summary = "Получить попытки по ID теста")
+    @GetMapping
+    @Operation(summary = "Получить все попытки (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Попытки найдены")
-    public ResponseEntity<List<TestAttempt>> getTestAttemptsByTest(
-            @Parameter(description = "ID теста", example = "1")
-            @PathVariable Integer testId) {
-        return ResponseEntity.ok(testAttemptService.getTestAttemptsByTest(testId));
+    public ResponseEntity<Page<TestAttempt>> getAllTestAttempts(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable
+                    pageable) {
+        return ResponseEntity.ok(testAttemptService.getAllTestAttempts(pageable));
     }
 
-    @GetMapping("/userId/{userId}")
-    @Operation(summary = "Получить попытки по ID пользователя")
+    @GetMapping("testId/{testId}")
+    @Operation(summary = "Получить попытки по ID теста (с пагинацией)")
     @ApiResponse(responseCode = "200", description = "Попытки найдены")
-    public ResponseEntity<List<TestAttempt>> getTestAttemptsByUser(
+    public ResponseEntity<Page<TestAttempt>> getTestAttemptsByTest(
+            @Parameter(description = "ID теста", example = "1")
+            @PathVariable Integer testId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable
+                    pageable) {
+        return ResponseEntity.ok(testAttemptService.getTestAttemptsByTest(testId, pageable));
+    }
+
+    @GetMapping("userId/{userId}")
+    @Operation(summary = "Получить попытки по ID пользователя (с пагинацией)")
+    @ApiResponse(responseCode = "200", description = "Попытки найдены")
+    public ResponseEntity<Page<TestAttempt>> getTestAttemptsByUser(
             @Parameter(description = "ID пользователя", example = "1")
-            @PathVariable Integer userId) {
-        return ResponseEntity.ok(testAttemptService.getTestAttemptsByUser(userId));
+            @PathVariable Integer userId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable
+                    pageable) {
+        return ResponseEntity.ok(testAttemptService.getTestAttemptsByUser(userId, pageable));
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Получить все попытки")
+    @Operation(summary = "Получить все попытки (без пагинации)")
     @ApiResponse(responseCode = "200", description = "Попытки найдены")
-    public ResponseEntity<List<TestAttempt>> getAllTestAttempts() {
-        return ResponseEntity.ok(testAttemptService.getAllTestAttempts());
+    public ResponseEntity<List<TestAttempt>> getAllTestAttemptsNoPagination() {
+        return ResponseEntity.ok(testAttemptService.getAllTestAttemptsList());
     }
 
     @PostMapping

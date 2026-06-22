@@ -15,6 +15,8 @@ import lms.repository.CourseRepository;
 import lms.repository.RoleRepository;
 import lms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,29 +40,29 @@ public class CourseService {
         this.roleRepository = roleRepository;
     }
 
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
-    }
-
     public Course getCourseById(Integer id) {
         return courseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Курс с ID " + id + " не нaйден"));
     }
 
-    public List<Course> getCoursesByTitle(String title) {
-        List<Course> courses = courseRepository.findByTitleContaining(title);
-        if (courses.isEmpty()) {
-            throw new NotFoundException("Курсы с названием '" + title + "' не найдены");
-        }
-        return courses;
+    public Page<Course> getAllCourses(Pageable pageable) {
+        return courseRepository.findAll(pageable);
     }
 
-    public List<Course> getCoursesByCategory(Integer categoryId) {
-        return courseRepository.findByCategoryId(categoryId);
+    public Page<Course> getCoursesByTitle(String title, Pageable pageable) {
+        return courseRepository.findByTitleContaining(title, pageable);
     }
 
-    public List<Course> getCoursesByTeacher(Integer teacherId) {
-        return courseRepository.findByTeacherId(teacherId);
+    public Page<Course> getCoursesByCategory(Integer categoryId, Pageable pageable) {
+        return courseRepository.findByCategoryId(categoryId, pageable);
+    }
+
+    public Page<Course> getCoursesByTeacher(Integer teacherId, Pageable pageable) {
+        return courseRepository.findByTeacherId(teacherId, pageable);
+    }
+
+    public List<Course> getAllCoursesList() {
+        return courseRepository.findAll();
     }
 
     public Course createCourse(CourseCreateDto dto) {

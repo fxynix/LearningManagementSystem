@@ -11,6 +11,8 @@ import lms.model.User;
 import lms.repository.RoleRepository;
 import lms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,22 +29,21 @@ public class UserService {
         this.roleRepository = roleRepository;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
     public User getUserById(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id + " не найден"));
     }
 
-    public  List<User> getUsersByUsername(String username) {
-        List<User> users = userRepository.findByUsernameContaining(username);
-        if (users.isEmpty()) {
-            throw new NotFoundException("Пользователей с никнеймом '" + users + "' не найдено");
-        }
-        return users;
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
 
+    public Page<User> getUsersByUsername(String username, Pageable pageable) {
+        return userRepository.findByUsernameContaining(username, pageable);
+    }
+
+    public List<User> getAllUsersList() {
+        return userRepository.findAll();
     }
 
     public User createUser(UserCreateDto dto) {

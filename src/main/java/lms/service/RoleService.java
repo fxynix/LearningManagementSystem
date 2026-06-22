@@ -7,6 +7,8 @@ import lms.exception.NotFoundException;
 import lms.model.Role;
 import lms.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,21 +23,21 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    public List<Role> getAllRoles() {
+    public Page<Role> getAllRoles(Pageable pageable) {
+        return roleRepository.findAll(pageable);
+    }
+
+    public Page<Role> getRolesByName(String name, Pageable pageable) {
+        return roleRepository.findByNameContaining(name, pageable);
+    }
+
+    public List<Role> getAllRolesList() {
         return roleRepository.findAll();
     }
 
     public Role getRoleById(Integer id) {
         return roleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Роль с ID " + id + " не найдена"));
-    }
-
-    public List<Role> getRolesByName(String name) {
-        List<Role> roles = roleRepository.findByNameContaining(name);
-        if (roles.isEmpty()) {
-            throw new NotFoundException("Роли с названием '" + name + "' не найдены");
-        }
-        return roles;
     }
 
     public Role createRole(RoleCreateDto dto) {
