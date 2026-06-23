@@ -49,16 +49,9 @@ public class CourseService {
         return courseRepository.findAll(pageable);
     }
 
-    public Page<Course> getCoursesByTitle(String title, Pageable pageable) {
-        return courseRepository.findByTitleContaining(title, pageable);
-    }
-
-    public Page<Course> getCoursesByCategory(Integer categoryId, Pageable pageable) {
-        return courseRepository.findByCategoryId(categoryId, pageable);
-    }
-
-    public Page<Course> getCoursesByTeacher(Integer teacherId, Pageable pageable) {
-        return courseRepository.findByTeacherId(teacherId, pageable);
+    public Page<Course> getFilteredCourses(String title, Integer categoryId, Integer teacherId,
+                                           Pageable pageable) {
+        return courseRepository.findByFilters(title, categoryId, teacherId, pageable);
     }
 
     public List<Course> getAllCoursesList() {

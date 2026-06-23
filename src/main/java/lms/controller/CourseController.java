@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -57,38 +58,20 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAllCourses(pageable));
     }
 
-    @GetMapping("title/{title}")
-    @Operation(summary = "Получить курсы по названию (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Курсы найдены")
-    @ApiResponse(responseCode = "404", description = "Курсов не найдено")
-    public ResponseEntity<Page<Course>> getCoursesByTitle(
-            @Parameter(description = "Название курса", example = "Java")
-            @PathVariable String title,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(courseService.getCoursesByTitle(title, pageable));
-    }
 
-    @GetMapping("categoryId/{categoryId}")
-    @Operation(summary = "Получить курсы по ID категории (с пагинацией)")
+    @GetMapping
+    @Operation(summary = "Получить курсы с пагинацией и фильтрацией")
     @ApiResponse(responseCode = "200", description = "Курсы найдены")
-    public ResponseEntity<Page<Course>> getCoursesByCategory(
-            @Parameter(description = "ID категории", example = "1")
-            @PathVariable Integer categoryId,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(courseService.getCoursesByCategory(categoryId, pageable));
-    }
-
-    @GetMapping("teacherId/{teacherId}")
-    @Operation(summary = "Получить курсы по ID преподавателя (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Курсы найдены")
-    public ResponseEntity<Page<Course>> getCoursesByTeacher(
-            @Parameter(description = "ID преподавателя", example = "2")
-            @PathVariable Integer teacherId,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(courseService.getCoursesByTeacher(teacherId, pageable));
+    public ResponseEntity<Page<Course>> getCourses(
+            @Parameter(description = "Название (частичное совпадение)")
+            @RequestParam(required = false) String title,
+            @Parameter(description = "ID категории")
+            @RequestParam(required = false) Integer categoryId,
+            @Parameter(description = "ID преподавателя")
+            @RequestParam(required = false) Integer teacherId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(courseService.getFilteredCourses(title, categoryId,
+                teacherId, pageable));
     }
 
     @GetMapping("/all")

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -48,25 +49,18 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @GetMapping("/all_p")
-    @Operation(summary = "Получить всех пользователей (с пагинацией)")
+    @GetMapping
+    @Operation(summary = "Получить пользователей с пагинацией и фильтрацией по логину")
     @ApiResponse(responseCode = "200", description = "Пользователи найдены")
-    public ResponseEntity<Page<User>> getAllUsers(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(userService.getAllUsers(pageable));
-    }
-
-    @GetMapping("username/{username}")
-    @Operation(summary = "Получить пользователей по логину (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Пользователи найдены")
-    @ApiResponse(responseCode = "404", description = "Пользователи не найдены")
-    public ResponseEntity<Page<User>> getUsersByUsername(
-            @Parameter(description = "Логин пользователя (часть)", example = "ivan")
-            @PathVariable String username,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(userService.getUsersByUsername(username, pageable));
+    public ResponseEntity<Page<User>> getUsers(
+            @Parameter(description = "Логин (частичное совпадение)")
+            @RequestParam(required = false) String username,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        if (username != null) {
+            return ResponseEntity.ok(userService.getUsersByUsername(username, pageable));
+        } else {
+            return ResponseEntity.ok(userService.getAllUsers(pageable));
+        }
     }
 
     @GetMapping("/all")

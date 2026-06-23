@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -48,25 +49,18 @@ public class RoleController {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
-    @GetMapping("/all_p")
-    @Operation(summary = "Получить все роли (с пагинацией)")
+    @GetMapping
+    @Operation(summary = "Получить роли с пагинацией и фильтрацией по названию")
     @ApiResponse(responseCode = "200", description = "Роли найдены")
-    public ResponseEntity<Page<Role>> getAllRoles(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(roleService.getAllRoles(pageable));
-    }
-
-    @GetMapping("name/{name}")
-    @Operation(summary = "Получить роли по названию (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Роли найдены")
-    @ApiResponse(responseCode = "404", description = "Ролей не найдено")
-    public ResponseEntity<Page<Role>> getRolesByName(
-            @Parameter(description = "Название роли", example = "ADMIN")
-            @PathVariable String name,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(roleService.getRolesByName(name, pageable));
+    public ResponseEntity<Page<Role>> getRoles(
+            @Parameter(description = "Название (частичное совпадение)")
+            @RequestParam(required = false) String name,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        if (name != null) {
+            return ResponseEntity.ok(roleService.getRolesByName(name, pageable));
+        } else {
+            return ResponseEntity.ok(roleService.getAllRoles(pageable));
+        }
     }
 
     @GetMapping("/all")

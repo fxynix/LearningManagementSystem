@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,45 +39,6 @@ public class LectureController {
         this.lectureService = lectureService;
     }
 
-    @GetMapping("/all_p")
-    @Operation(summary = "Получить все лекции (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Лекции найдены")
-    public ResponseEntity<Page<Lecture>> getAllLectures(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(lectureService.getAllLectures(pageable));
-    }
-
-    @GetMapping("title/{title}")
-    @Operation(summary = "Получить лекции по названию (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Лекции найдены")
-    @ApiResponse(responseCode = "404", description = "Лекций не найдено")
-    public ResponseEntity<Page<Lecture>> getLecturesByTitle(
-            @Parameter(description = "Название лекции", example = "Введение")
-            @PathVariable String title,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(lectureService.getLecturesByTitle(title, pageable));
-    }
-
-    @GetMapping("courseId/{courseId}")
-    @Operation(summary = "Получить лекции по ID курса (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Лекции найдены")
-    public ResponseEntity<Page<Lecture>> getLecturesByCourse(
-            @Parameter(description = "ID курса", example = "1")
-            @PathVariable Integer courseId,
-            @PageableDefault(sort = "orderNumber", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(lectureService.getLecturesByCourse(courseId, pageable));
-    }
-
-    @GetMapping("/all")
-    @Operation(summary = "Получить все лекции (без пагинации)")
-    @ApiResponse(responseCode = "200", description = "Лекции найдены")
-    public ResponseEntity<List<Lecture>> getAllLecturesNoPagination() {
-        return ResponseEntity.ok(lectureService.getAllLecturesList());
-    }
-
     @GetMapping("{id}")
     @Operation(summary = "Получить лекцию по ID")
     @ApiResponse(responseCode = "200", description = "Лекция найдена")
@@ -85,6 +47,25 @@ public class LectureController {
             @Parameter(description = "ID лекции", example = "1")
             @PathVariable Integer id) {
         return ResponseEntity.ok(lectureService.getLectureById(id));
+    }
+
+    @GetMapping
+    @Operation(summary = "Получить лекции с пагинацией и фильтрацией")
+    @ApiResponse(responseCode = "200", description = "Лекции найдены")
+    public ResponseEntity<Page<Lecture>> getLectures(
+            @Parameter(description = "Название (частичное совпадение)")
+            @RequestParam(required = false) String title,
+            @Parameter(description = "ID курса")
+            @RequestParam(required = false) Integer courseId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(lectureService.getFilteredLectures(title, courseId, pageable));
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Получить все лекции (без пагинации)")
+    @ApiResponse(responseCode = "200", description = "Лекции найдены")
+    public ResponseEntity<List<Lecture>> getAllLecturesNoPagination() {
+        return ResponseEntity.ok(lectureService.getAllLecturesList());
     }
 
     @PostMapping

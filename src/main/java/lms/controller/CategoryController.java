@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -48,25 +49,18 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
-    @GetMapping("name/{name}")
-    @Operation(summary = "Получить категории по названию (с пагинацией)")
+    @GetMapping
+    @Operation(summary = "Получить категории с пагинацией и фильтрацией по названию")
     @ApiResponse(responseCode = "200", description = "Категории найдены")
-    @ApiResponse(responseCode = "404", description = "Категорий не найдено")
-    public ResponseEntity<Page<Category>> getCategoriesByName(
-            @Parameter(description = "Название категории", example = "Программирование")
-            @PathVariable String name,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(categoryService.getCategoriesByTitle(name, pageable));
-    }
-
-    @GetMapping("/all_p")
-    @Operation(summary = "Получить все категории (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Категории найдены")
-    public ResponseEntity<Page<Category>> getAllCategories(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-        return ResponseEntity.ok(categoryService.getAllCategories(pageable));
+    public ResponseEntity<Page<Category>> getCategories(
+            @Parameter(description = "Название (частичное совпадение)")
+            @RequestParam(required = false) String name,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        if (name != null) {
+            return ResponseEntity.ok(categoryService.getCategoriesByTitle(name, pageable));
+        } else {
+            return ResponseEntity.ok(categoryService.getAllCategories(pageable));
+        }
     }
 
     @GetMapping("/all")

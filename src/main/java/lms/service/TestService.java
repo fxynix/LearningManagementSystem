@@ -27,16 +27,8 @@ public class TestService {
         this.courseRepository = courseRepository;
     }
 
-    public Page<Test> getAllTests(Pageable pageable) {
-        return testRepository.findAll(pageable);
-    }
-
-    public Page<Test> getTestsByTitle(String title, Pageable pageable) {
-        return testRepository.findByTitleContaining(title, pageable);
-    }
-
-    public Page<Test> getTestsByCourse(Integer courseId, Pageable pageable) {
-        return testRepository.findByCourseId(courseId, pageable);
+    public Page<Test> getFilteredTests(String title, Integer courseId, Pageable pageable) {
+        return testRepository.findByFilters(title, courseId, pageable);
     }
 
     public List<Test> getAllTestsList() {

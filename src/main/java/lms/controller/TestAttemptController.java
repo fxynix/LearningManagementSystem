@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -49,35 +50,21 @@ public class TestAttemptController {
         return ResponseEntity.ok(testAttemptService.getTestAttemptById(id));
     }
 
-    @GetMapping("/all_p")
-    @Operation(summary = "Получить все попытки (с пагинацией)")
+    @GetMapping
+    @Operation(summary = "Получить попытки с пагинацией и фильтрацией")
     @ApiResponse(responseCode = "200", description = "Попытки найдены")
-    public ResponseEntity<Page<TestAttempt>> getAllTestAttempts(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable
-                    pageable) {
-        return ResponseEntity.ok(testAttemptService.getAllTestAttempts(pageable));
-    }
-
-    @GetMapping("testId/{testId}")
-    @Operation(summary = "Получить попытки по ID теста (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Попытки найдены")
-    public ResponseEntity<Page<TestAttempt>> getTestAttemptsByTest(
-            @Parameter(description = "ID теста", example = "1")
-            @PathVariable Integer testId,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable
-                    pageable) {
-        return ResponseEntity.ok(testAttemptService.getTestAttemptsByTest(testId, pageable));
-    }
-
-    @GetMapping("userId/{userId}")
-    @Operation(summary = "Получить попытки по ID пользователя (с пагинацией)")
-    @ApiResponse(responseCode = "200", description = "Попытки найдены")
-    public ResponseEntity<Page<TestAttempt>> getTestAttemptsByUser(
-            @Parameter(description = "ID пользователя", example = "1")
-            @PathVariable Integer userId,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable
-                    pageable) {
-        return ResponseEntity.ok(testAttemptService.getTestAttemptsByUser(userId, pageable));
+    public ResponseEntity<Page<TestAttempt>> getTestAttempts(
+            @Parameter(description = "ID теста")
+            @RequestParam(required = false) Integer testId,
+            @Parameter(description = "ID пользователя")
+            @RequestParam(required = false) Integer userId,
+            @Parameter(description = "Название теста")
+            @RequestParam(required = false) String  testTitle,
+            @Parameter(description = "Логин пользователя")
+            @RequestParam(required = false) String userUsername,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(testAttemptService.getFilteredAttempts(testId, userId, testTitle,
+                userUsername, pageable));
     }
 
     @GetMapping("/all")

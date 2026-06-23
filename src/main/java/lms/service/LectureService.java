@@ -32,16 +32,8 @@ public class LectureService {
                 .orElseThrow(() -> new NotFoundException("Лекция с ID " + id + " не найдена"));
     }
 
-    public Page<Lecture> getAllLectures(Pageable pageable) {
-        return lectureRepository.findAll(pageable);
-    }
-
-    public Page<Lecture> getLecturesByTitle(String title, Pageable pageable) {
-        return lectureRepository.findByTitleContaining(title, pageable);
-    }
-
-    public Page<Lecture> getLecturesByCourse(Integer courseId, Pageable pageable) {
-        return lectureRepository.findByCourseIdOrderByOrderNumber(courseId, pageable);
+    public Page<Lecture> getFilteredLectures(String title, Integer courseId, Pageable pageable) {
+        return lectureRepository.findByFilters(title, courseId, pageable);
     }
 
     public List<Lecture> getAllLecturesList() {

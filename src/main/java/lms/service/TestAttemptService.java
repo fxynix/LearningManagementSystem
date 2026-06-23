@@ -33,16 +33,10 @@ public class TestAttemptService {
         this.userRepository = userRepository;
     }
 
-    public Page<TestAttempt> getAllTestAttempts(Pageable pageable) {
-        return testAttemptRepository.findAll(pageable);
-    }
-
-    public Page<TestAttempt> getTestAttemptsByTest(Integer testId, Pageable pageable) {
-        return testAttemptRepository.findByTestId(testId, pageable);
-    }
-
-    public Page<TestAttempt> getTestAttemptsByUser(Integer userId, Pageable pageable) {
-        return testAttemptRepository.findByUserId(userId, pageable);
+    public Page<TestAttempt> getFilteredAttempts(Integer testId, Integer userId, String testTitle,
+                                                 String userUsername, Pageable pageable) {
+        return testAttemptRepository.findByFilters(testId, userId, testTitle,
+                userUsername, pageable);
     }
 
     public List<TestAttempt> getAllTestAttemptsList() {

@@ -1,6 +1,7 @@
 package lms.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,7 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
@@ -21,6 +24,8 @@ import org.hibernate.annotations.CreationTimestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Role {
 
     @Id
@@ -39,9 +44,11 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
+    @ToString.Exclude
     private Set<User> users = new HashSet<>();
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
+    @ToString.Exclude
     private Set<Course> courses = new HashSet<>();
 }
