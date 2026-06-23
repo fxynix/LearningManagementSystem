@@ -2,7 +2,10 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
 .env
+!frontend-react/.env
+
 *.iml
 frontend-react/node_modules/
 ### IntelliJ IDEA ###

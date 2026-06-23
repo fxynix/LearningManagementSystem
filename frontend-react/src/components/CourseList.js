@@ -7,11 +7,16 @@ import { getCourses, createCourse, updateCourse, deleteCourse } from '../api/cou
 import { getAllCategories } from '../api/categoryApi';
 import { getAllUsers } from '../api/userApi';
 import { getAllRoles } from '../api/roleApi';
+import { useAuth } from '../context/AuthContext';
 
 const { Column } = Table;
 const { Option } = Select;
 
 const CourseList = () => {
+    const { user } = useAuth();
+    const isAdmin = user.roles?.includes('ADMIN') || false;
+    const isTeacher = user.roles?.includes('TEACHER') || false;
+
     const [courses, setCourses] = useState([]);
     const [categories, setCategories] = useState([]);
     const [teachers, setTeachers] = useState([]);
@@ -172,6 +177,10 @@ const CourseList = () => {
         });
     };
 
+    const canEdit = (course) => {
+        return isAdmin || (isTeacher && course.teacher?.id === user.id);
+    };
+
     return (
         <Spin spinning={loading}>
             <div style={{ padding: 24 }}>
@@ -210,9 +219,11 @@ const CourseList = () => {
                         </Select>
                         <Button onClick={handleReset}>Сбросить</Button>
                     </Space>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
-                        Добавить курс
-                    </Button>
+                    {(isAdmin || isTeacher) && (
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
+                            Добавить курс
+                        </Button>
+                    )}
                 </div>
 
                 <Table
@@ -244,12 +255,15 @@ const CourseList = () => {
                     />
                     <Column
                         title="Действия"
-                        render={(_, c) => (
-                            <Space>
-                                <Button icon={<EditOutlined />} onClick={() => showModal(c)} />
-                                <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(c.id)} />
-                            </Space>
-                        )}
+                        render={(_, course) => {
+                            if (!canEdit(course)) return null;
+                            return (
+                                <Space>
+                                    <Button icon={<EditOutlined />} onClick={() => showModal(course)} />
+                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(course.id)} />
+                                </Space>
+                            );
+                        }}
                     />
                 </Table>
 

@@ -7,6 +7,7 @@ import { getTestAttempts, createTestAttempt, updateTestAttempt, deleteTestAttemp
 import { getAllTests } from '../api/testApi';
 import { getAllUsers } from '../api/userApi';
 import { formatDateTime } from '../utils/dateUtils';
+import { useAuth } from '../context/AuthContext';
 
 const { Column } = Table;
 const { Option } = Select;
@@ -21,6 +22,10 @@ const translateStatus = (status) => {
 };
 
 const TestAttemptList = () => {
+    const { user } = useAuth();
+    const isAdmin = user.roles?.includes('ADMIN') || false;
+
+
     const [attempts, setAttempts] = useState([]);
     const [tests, setTests] = useState([]);
     const [users, setUsers] = useState([]);
@@ -179,20 +184,22 @@ const TestAttemptList = () => {
                             allowClear
                             value={queryParams.testTitle}
                             onChange={handleSearchChange('testTitle')}
-                            style={{ width: 205 }}
+                            style={{ width: 200 }}
                         />
                         <Input
                             placeholder="Поиск по логину пользователя"
                             allowClear
                             value={queryParams.userUsername}
                             onChange={handleSearchChange('userUsername')}
-                            style={{ width: 240 }}
+                            style={{ width: 200 }}
                         />
                         <Button onClick={handleReset}>Сбросить</Button>
                     </Space>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
-                        Добавить попытку
-                    </Button>
+                    {isAdmin && (
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
+                            Добавить попытку
+                        </Button>
+                    )}
                 </div>
 
                 <Table
@@ -218,12 +225,15 @@ const TestAttemptList = () => {
                     <Column title="Статус" render={(_, a) => translateStatus(a.status)} />
                     <Column
                         title="Действия"
-                        render={(_, a) => (
-                            <Space>
-                                <Button icon={<EditOutlined />} onClick={() => showModal(a)} />
-                                <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(a.id)} />
-                            </Space>
-                        )}
+                        render={(_, attempt) => {
+                            if (!isAdmin) return null;
+                            return (
+                                <Space>
+                                    <Button icon={<EditOutlined />} onClick={() => showModal(attempt)} />
+                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(attempt.id)} />
+                                </Space>
+                            );
+                        }}
                     />
                 </Table>
 

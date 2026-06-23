@@ -1,15 +1,15 @@
 -- Пользователи
 INSERT INTO users (username, email, password, full_name) VALUES
-('ivan.petrov', 'ivan.petrov@mail.ru', 'password1', 'Иван Петров'),
-('maria.smirnova', 'maria.smirnova@mail.ru', 'password2', 'Мария Смирнова'),
-('aleksei.kuznetsov', 'aleksei.kuznetsov@mail.ru', 'password3', 'Алексей Кузнецов'),
-('elena.popova', 'elena.popova@mail.ru', 'password4', 'Елена Попова'),
-('dmitry.sokolov', 'dmitry.sokolov@mail.ru', 'password5', 'Дмитрий Соколов'),
-('anna.volkova', 'anna.volkova@mail.ru', 'password6', 'Анна Волкова'),
-('sergey.morozov', 'sergey.morozov@mail.ru', 'password7', 'Сергей Морозов'),
-('olga.novikova', 'olga.novikova@mail.ru', 'password8', 'Ольга Новикова'),
-('nikolay.pavlov', 'nikolay.pavlov@mail.ru', 'password9', 'Николай Павлов'),
-('tatiana.grigorieva', 'tatiana.grigorieva@mail.ru', 'password10', 'Татьяна Григорьева');
+('admin', 'admin@mail.ru', '111111', 'Иван Петров'),
+('maria.smirnova', 'maria.smirnova@mail.ru', '222222', 'Мария Смирнова'),
+('aleksei.kuznetsov', 'aleksei.kuznetsov@mail.ru', '333333', 'Алексей Кузнецов'),
+('elena.popova', 'elena.popova@mail.ru', '444444', 'Елена Попова'),
+('dmitry.sokolov', 'dmitry.sokolov@mail.ru', '555555', 'Дмитрий Соколов'),
+('anna.volkova', 'anna.volkova@mail.ru', '6666666', 'Анна Волкова'),
+('sergey.morozov', 'sergey.morozov@mail.ru', '777777', 'Сергей Морозов'),
+('olga.novikova', 'olga.novikova@mail.ru', '888888', 'Ольга Новикова'),
+('nikolay.pavlov', 'nikolay.pavlov@mail.ru', '999999', 'Николай Павлов'),
+('tatiana.grigorieva', 'tatiana.grigorieva@mail.ru', '000000', 'Татьяна Григорьева');
 
 -- Роли
 INSERT INTO roles (name, description) VALUES

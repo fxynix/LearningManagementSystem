@@ -4,10 +4,13 @@ import {
 } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../api/categoryApi';
+import { useAuth } from '../context/AuthContext';
 
 const { Column } = Table;
 
 const CategoryList = () => {
+    const { user } = useAuth();
+
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -30,6 +33,10 @@ const CategoryList = () => {
     useEffect(() => {
         fetchCategories();
     }, [queryParams]);
+
+    const isAdmin = user.roles?.includes('ADMIN') || false;
+    const isTeacher = user.roles?.includes('TEACHER') || false;
+    const canManage = isAdmin || isTeacher;
 
     const fetchCategories = async () => {
         setLoading(true);
@@ -155,9 +162,11 @@ const CategoryList = () => {
                         />
                         <Button onClick={handleReset}>Сбросить</Button>
                     </Space>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
-                        Добавить категорию
-                    </Button>
+                    {canManage && (
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
+                            Добавить категорию
+                        </Button>
+                    )}
                 </div>
 
                 <Table
@@ -178,12 +187,15 @@ const CategoryList = () => {
                     <Column title="Описание" dataIndex="description" />
                     <Column
                         title="Действия"
-                        render={(_, category) => (
-                            <Space>
-                                <Button icon={<EditOutlined />} onClick={() => showModal(category)} />
-                                <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(category.id)} />
-                            </Space>
-                        )}
+                        render={(_, category) => {
+                            if (!canManage) return null;
+                            return (
+                                <Space>
+                                    <Button icon={<EditOutlined />} onClick={() => showModal(category)} />
+                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(category.id)} />
+                                </Space>
+                            );
+                        }}
                     />
                 </Table>
 

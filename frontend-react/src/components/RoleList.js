@@ -5,10 +5,13 @@ import {
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getRoles, createRole, updateRole, deleteRole } from '../api/roleApi';
 import { getAllUsers } from '../api/userApi';
+import { useAuth } from '../context/AuthContext';
 
 const { Column } = Table;
 
 const RoleList = () => {
+    const { user } = useAuth();
+
     const [roles, setRoles] = useState([]);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -44,6 +47,10 @@ const RoleList = () => {
     useEffect(() => {
         fetchRoles();
     }, [queryParams]);
+
+    if (!user.roles?.includes('ADMIN')) {
+        return <div>Доступ запрещён</div>;
+    }
 
     const fetchRoles = async () => {
         setLoading(true);

@@ -6,11 +6,16 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getTests, createTest, updateTest, deleteTest } from '../api/testApi';
 import { getAllCourses } from '../api/courseApi';
 import { formatDateTime } from '../utils/dateUtils';
+import { useAuth } from '../context/AuthContext';
 
 const { Column } = Table;
 const { Option } = Select;
 
 const TestList = () => {
+    const { user } = useAuth();
+    const isAdmin = user.roles?.includes('ADMIN') || false;
+    const isTeacher = user.roles?.includes('TEACHER') || false;
+
     const [tests, setTests] = useState([]);
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -164,6 +169,10 @@ const TestList = () => {
         });
     };
 
+    const canEdit = (test) => {
+        return isAdmin || (isTeacher && test.course?.teacher?.id === user.id);
+    };
+
     return (
         <Spin spinning={loading}>
             <div style={{ padding: 24 }}>
@@ -189,9 +198,11 @@ const TestList = () => {
                         </Select>
                         <Button onClick={handleReset}>Сбросить</Button>
                     </Space>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
-                        Добавить тест
-                    </Button>
+                    {(isAdmin || isTeacher) && (
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
+                            Добавить тест
+                        </Button>
+                    )}
                 </div>
 
                 <Table
@@ -215,12 +226,15 @@ const TestList = () => {
                     <Column title="Дата окончания" render={(_, t) => formatDateTime(t.endDate)} />
                     <Column
                         title="Действия"
-                        render={(_, t) => (
-                            <Space>
-                                <Button icon={<EditOutlined />} onClick={() => showModal(t)} />
-                                <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(t.id)} />
-                            </Space>
-                        )}
+                        render={(_, test) => {
+                            if (!canEdit(test)) return null;
+                            return (
+                                <Space>
+                                    <Button icon={<EditOutlined />} onClick={() => showModal(test)} />
+                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(test.id)} />
+                                </Space>
+                            );
+                        }}
                     />
                 </Table>
 

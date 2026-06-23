@@ -5,11 +5,16 @@ import {
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getLectures, createLecture, updateLecture, deleteLecture } from '../api/lectureApi';
 import { getAllCourses } from '../api/courseApi';
+import { useAuth } from '../context/AuthContext';
 
 const { Column } = Table;
 const { Option } = Select;
 
 const LectureList = () => {
+    const { user } = useAuth();
+    const isAdmin = user.roles?.includes('ADMIN') || false;
+    const isTeacher = user.roles?.includes('TEACHER') || false;
+
     const [lectures, setLectures] = useState([]);
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -158,6 +163,10 @@ const LectureList = () => {
         });
     };
 
+    const canEdit = (lecture) => {
+        return isAdmin || (isTeacher && lecture.course?.teacher?.id === user.id);
+    };
+
     return (
         <Spin spinning={loading}>
             <div style={{ padding: 24 }}>
@@ -183,9 +192,11 @@ const LectureList = () => {
                         </Select>
                         <Button onClick={handleReset}>Сбросить</Button>
                     </Space>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
-                        Добавить лекцию
-                    </Button>
+                    {(isAdmin || isTeacher) && (
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
+                            Добавить лекцию
+                        </Button>
+                    )}
                 </div>
 
                 <Table
@@ -207,12 +218,15 @@ const LectureList = () => {
                     <Column title="Порядок" dataIndex="orderNumber" />
                     <Column
                         title="Действия"
-                        render={(_, l) => (
-                            <Space>
-                                <Button icon={<EditOutlined />} onClick={() => showModal(l)} />
-                                <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(l.id)} />
-                            </Space>
-                        )}
+                        render={(_, lecture) => {
+                            if (!canEdit(lecture)) return null;
+                            return (
+                                <Space>
+                                    <Button icon={<EditOutlined />} onClick={() => showModal(lecture)} />
+                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(lecture.id)} />
+                                </Space>
+                            );
+                        }}
                     />
                 </Table>
 
