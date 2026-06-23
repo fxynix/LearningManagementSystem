@@ -4,7 +4,7 @@ target/
 !**/src/test/**/target/
 .env
 *.iml
-
+frontend-react/node_modules/
 ### IntelliJ IDEA ###
 .idea
 out/
