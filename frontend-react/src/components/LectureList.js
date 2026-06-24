@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    Table, Button, Space, Modal, Form, Input, InputNumber, Select, message, Spin
-} from 'antd';
+import { Table, Button, Space, Modal, Form, Input, InputNumber, Select, message, Spin } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { getLectures, createLecture, updateLecture, deleteLecture } from '../api/lectureApi';
 import { getAllCourses } from '../api/courseApi';
 import { useAuth } from '../context/AuthContext';
@@ -27,6 +26,8 @@ const LectureList = () => {
         size: 10,
         title: '',
         courseId: undefined,
+        userId: user.id,
+        roles: user.roles ? user.roles.join(',') : '',
     });
     const [paginationInfo, setPaginationInfo] = useState({
         current: 1,
@@ -101,12 +102,12 @@ const LectureList = () => {
     };
 
     const handleReset = () => {
-        setQueryParams({
+        setQueryParams(prev => ({
+            ...prev,
             page: 0,
-            size: 10,
             title: '',
             courseId: undefined,
-        });
+        }));
     };
 
     const showModal = (lecture = null) => {
@@ -212,22 +213,30 @@ const LectureList = () => {
                     onChange={handleTableChange}
                     loading={loading}
                 >
-                    <Column title="ID" dataIndex="id" />
-                    <Column title="Название" dataIndex="title" />
-                    <Column title="Курс" render={(_, l) => l.course?.title || '—'} />
-                    <Column title="Порядок" dataIndex="orderNumber" />
+                    {isAdmin && <Column title="ID" dataIndex="id" />}
                     <Column
-                        title="Действия"
-                        render={(_, lecture) => {
-                            if (!canEdit(lecture)) return null;
-                            return (
-                                <Space>
-                                    <Button icon={<EditOutlined />} onClick={() => showModal(lecture)} />
-                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(lecture.id)} />
-                                </Space>
-                            );
-                        }}
+                        title="Название"
+                        render={(_, l) => <Link to={`/lectures/${l.id}`}>{l.title}</Link>}
                     />
+                    <Column
+                        title="Курс"
+                        render={(_, l) => l.course ? <Link to={`/courses/${l.course.id}`}>{l.course.title}</Link> : '—'}
+                    />
+                    <Column title="Порядок" dataIndex="orderNumber" />
+                    {(isAdmin || isTeacher) && (
+                        <Column
+                            title="Действия"
+                            render={(_, lecture) => {
+                                if (!canEdit(lecture)) return null;
+                                return (
+                                    <Space>
+                                        <Button icon={<EditOutlined />} onClick={() => showModal(lecture)} />
+                                        <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(lecture.id)} />
+                                    </Space>
+                                );
+                            }}
+                        />
+                    )}
                 </Table>
 
                 <Modal

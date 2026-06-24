@@ -1,5 +1,6 @@
 package lms.repository;
 
+import java.util.List;
 import lms.model.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,19 +9,48 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+
 @Repository
 public interface TestRepository extends JpaRepository<Test, Integer> {
 
     @Query(value = "SELECT t.* FROM tests t "
             + "LEFT JOIN courses c ON t.course_id = c.id "
-            + "WHERE (:title IS NULL OR CAST(t.title AS TEXT) ILIKE CONCAT('%', :title, '%')) "
-            + "AND (:courseId IS NULL OR t.course_id = :courseId)",
+            + "WHERE (:title IS NULL OR CAST(t.title AS TEXT) ILIKE "
+            + "       CONCAT('%', CAST(:title AS TEXT), '%')) "
+            + "AND (:courseId IS NULL OR t.course_id = :courseId) "
+            + "AND ( "
+            + "    (:isAdmin = TRUE) "
+            + "    OR (:isTeacher = TRUE AND c.teacher_id = :userId) "
+            + "    OR (EXISTS ( "
+            + "          SELECT 1 FROM course_roles cr "
+            + "          WHERE cr.course_id = t.course_id "
+            + "          AND cr.role_id IN ( "
+            + "              SELECT r.id FROM roles r WHERE r.name IN (:roles) "
+            + "          ) "
+            + "        ))"
+            + ")",
             countQuery = "SELECT COUNT(*) FROM tests t "
-                    + "WHERE (:title IS NULL OR "
-                    + "CAST(t.title AS TEXT) ILIKE CONCAT('%', :title, '%')) "
-                    + "AND (:courseId IS NULL OR t.course_id = :courseId)",
+                    + "LEFT JOIN courses c ON t.course_id = c.id "
+                    + "WHERE (:title IS NULL OR CAST(t.title AS TEXT) ILIKE "
+                    + "       CONCAT('%', CAST(:title AS TEXT), '%')) "
+                    + "AND (:courseId IS NULL OR t.course_id = :courseId) "
+                    + "AND ( "
+                    + "    (:isAdmin = TRUE) "
+                    + "    OR (:isTeacher = TRUE AND c.teacher_id = :userId) "
+                    + "    OR (EXISTS ( "
+                    + "          SELECT 1 FROM course_roles cr "
+                    + "          WHERE cr.course_id = t.course_id "
+                    + "          AND cr.role_id IN ( "
+                    + "              SELECT r.id FROM roles r WHERE r.name IN (:roles) "
+                    + "          ) "
+                    + "        ))"
+                    + ")",
             nativeQuery = true)
-    Page<Test> findByFilters(@Param("title") String title,
-                             @Param("courseId") Integer courseId,
-                             Pageable pageable);
+    Page<Test> findTestsByFiltersAndUser(@Param("title") String title,
+                                         @Param("courseId") Integer courseId,
+                                         @Param("isAdmin") boolean isAdmin,
+                                         @Param("isTeacher") boolean isTeacher,
+                                         @Param("userId") Integer userId,
+                                         @Param("roles") List<String> roles,
+                                         Pageable pageable);
 }

@@ -50,15 +50,21 @@ public class LectureController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить лекции с пагинацией и фильтрацией")
+    @Operation(summary = "Получить лекции с пагинацией и фильтрацией с учётом прав пользователя")
     @ApiResponse(responseCode = "200", description = "Лекции найдены")
     public ResponseEntity<Page<Lecture>> getLectures(
             @Parameter(description = "Название (частичное совпадение)")
             @RequestParam(required = false) String title,
-            @Parameter(description = "ID курса")
+            @Parameter(description = "ID курса (фильтр)")
             @RequestParam(required = false) Integer courseId,
+            @Parameter(description = "ID текущего пользователя")
+            @RequestParam(required = false) Integer userId,
+            @Parameter(description = "Список ролей пользователя (через запятую)")
+            @RequestParam(required = false) String roles,
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.ok(lectureService.getFilteredLectures(title, courseId, pageable));
+        Page<Lecture> lectures = lectureService.getFilteredLectures(title, courseId, userId,
+                roles, pageable);
+        return ResponseEntity.ok(lectures);
     }
 
     @GetMapping("/all")

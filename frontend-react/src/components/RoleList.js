@@ -6,6 +6,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getRoles, createRole, updateRole, deleteRole } from '../api/roleApi';
 import { getAllUsers } from '../api/userApi';
 import { useAuth } from '../context/AuthContext';
+import {Link} from "react-router-dom";
 
 const { Column } = Table;
 
@@ -199,7 +200,10 @@ const RoleList = () => {
                     loading={loading}
                 >
                     <Column title="ID" dataIndex="id" />
-                    <Column title="Название" dataIndex="name" />
+                    <Column
+                        title="Название"
+                        render={(_, r) => <Link to={`/roles/${r.id}`}>{r.name}</Link>}
+                    />
                     <Column title="Описание" dataIndex="description" />
                     <Column
                         title="Пользователей"

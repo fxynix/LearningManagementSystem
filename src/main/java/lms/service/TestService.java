@@ -1,5 +1,7 @@
 package lms.service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import lms.dto.create.TestCreateDto;
 import lms.dto.update.TestUpdateDto;
@@ -27,8 +29,14 @@ public class TestService {
         this.courseRepository = courseRepository;
     }
 
-    public Page<Test> getFilteredTests(String title, Integer courseId, Pageable pageable) {
-        return testRepository.findByFilters(title, courseId, pageable);
+    public Page<Test> getFilteredTests(String title, Integer courseId,
+                                       Integer userId, String roles, Pageable pageable) {
+        List<String> roleList = roles != null ? Arrays.asList(roles.split(",")) :
+                Collections.emptyList();
+        boolean isAdmin = roles != null && roles.contains("ADMIN");
+        boolean isTeacher = roles != null && roles.contains("TEACHER");
+        return testRepository.findTestsByFiltersAndUser(title, courseId, isAdmin, isTeacher,
+                userId, roleList, pageable);
     }
 
     public List<Test> getAllTestsList() {

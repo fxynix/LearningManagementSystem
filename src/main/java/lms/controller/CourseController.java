@@ -60,18 +60,23 @@ public class CourseController {
 
 
     @GetMapping
-    @Operation(summary = "Получить курсы с пагинацией и фильтрацией")
+    @Operation(summary = "Получить курсы с пагинацией и фильтрацией с учётом прав пользователя")
     @ApiResponse(responseCode = "200", description = "Курсы найдены")
     public ResponseEntity<Page<Course>> getCourses(
             @Parameter(description = "Название (частичное совпадение)")
             @RequestParam(required = false) String title,
             @Parameter(description = "ID категории")
             @RequestParam(required = false) Integer categoryId,
-            @Parameter(description = "ID преподавателя")
+            @Parameter(description = "ID преподавателя (фильтр)")
             @RequestParam(required = false) Integer teacherId,
+            @Parameter(description = "ID текущего пользователя для проверки прав")
+            @RequestParam(required = false) Integer userId,
+            @Parameter(description = "Список ролей пользователя (передавать через запятую)")
+            @RequestParam(required = false) String roles,
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.ok(courseService.getFilteredCourses(title, categoryId,
-                teacherId, pageable));
+        Page<Course> courses = courseService.getFilteredCourses(title, categoryId, teacherId,
+                userId, roles, pageable);
+        return ResponseEntity.ok(courses);
     }
 
     @GetMapping("/all")

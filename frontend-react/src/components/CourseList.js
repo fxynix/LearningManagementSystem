@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin
-} from 'antd';
+import { Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { getCourses, createCourse, updateCourse, deleteCourse } from '../api/courseApi';
 import { getAllCategories } from '../api/categoryApi';
 import { getAllUsers } from '../api/userApi';
@@ -32,6 +31,8 @@ const CourseList = () => {
         title: '',
         categoryId: undefined,
         teacherId: undefined,
+        userId: user.id,
+        roles: user.roles ? user.roles.join(',') : '',
     });
     const [paginationInfo, setPaginationInfo] = useState({
         current: 1,
@@ -70,6 +71,7 @@ const CourseList = () => {
             if (!params.title) delete params.title;
             if (params.categoryId === undefined) delete params.categoryId;
             if (params.teacherId === undefined) delete params.teacherId;
+            // userId и roles всегда есть, их не удаляем
             const res = await getCourses(params);
             setCourses(res.data.content);
             setPaginationInfo({
@@ -113,13 +115,13 @@ const CourseList = () => {
     };
 
     const handleReset = () => {
-        setQueryParams({
+        setQueryParams(prev => ({
+            ...prev,
             page: 0,
-            size: 10,
             title: '',
             categoryId: undefined,
             teacherId: undefined,
-        });
+        }));
     };
 
     const showModal = (course = null) => {
@@ -239,32 +241,42 @@ const CourseList = () => {
                     onChange={handleTableChange}
                     loading={loading}
                 >
-                    <Column title="ID" dataIndex="id" />
-                    <Column title="Название" dataIndex="title" />
-                    <Column title="Категория" render={(_, c) => c.category?.name || '—'} />
+                    {isAdmin && <Column title="ID" dataIndex="id" />}
+                    <Column
+                        title="Название"
+                        render={(_, c) => <Link to={`/courses/${c.id}`}>{c.title}</Link>}
+                    />
+                    <Column
+                        title="Категория"
+                        render={(_, c) => c.category ? <Link to={`/categories/${c.category.id}`}>{c.category.name}</Link> : '—'}
+                    />
                     <Column title="Преподаватель" render={(_, c) => c.teacher?.fullName || '—'} />
                     <Column
                         title="Роли (доступ)"
                         render={(_, c) => (
                             <Space wrap>
                                 {c.roles?.map(role => (
-                                    <Tag key={role.id} color="blue">{role.name}</Tag>
+                                    <Link key={role.id} to={`/roles/${role.id}`}>
+                                        <Tag color="blue">{role.name}</Tag>
+                                    </Link>
                                 )) || '—'}
                             </Space>
                         )}
                     />
-                    <Column
-                        title="Действия"
-                        render={(_, course) => {
-                            if (!canEdit(course)) return null;
-                            return (
-                                <Space>
-                                    <Button icon={<EditOutlined />} onClick={() => showModal(course)} />
-                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(course.id)} />
-                                </Space>
-                            );
-                        }}
-                    />
+                    {(isAdmin || isTeacher) && (
+                        <Column
+                            title="Действия"
+                            render={(_, course) => {
+                                if (!canEdit(course)) return null;
+                                return (
+                                    <Space>
+                                        <Button icon={<EditOutlined />} onClick={() => showModal(course)} />
+                                        <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(course.id)} />
+                                    </Space>
+                                );
+                            }}
+                        />
+                    )}
                 </Table>
 
                 <Modal

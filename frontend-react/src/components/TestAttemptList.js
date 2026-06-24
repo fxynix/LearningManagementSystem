@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    Table, Button, Space, Modal, Form, InputNumber, Select, Input, message, Spin
-} from 'antd';
+import { Table, Button, Space, Modal, Form, InputNumber, Select, Input, message, Spin } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { getTestAttempts, createTestAttempt, updateTestAttempt, deleteTestAttempt } from '../api/testAttemptApi';
 import { getAllTests } from '../api/testApi';
 import { getAllUsers } from '../api/userApi';
@@ -25,7 +24,6 @@ const TestAttemptList = () => {
     const { user } = useAuth();
     const isAdmin = user.roles?.includes('ADMIN') || false;
 
-
     const [attempts, setAttempts] = useState([]);
     const [tests, setTests] = useState([]);
     const [users, setUsers] = useState([]);
@@ -39,6 +37,8 @@ const TestAttemptList = () => {
         size: 10,
         testTitle: '',
         userUsername: '',
+        currentUserId: user.id,
+        roles: user.roles ? user.roles.join(',') : '',
     });
     const [paginationInfo, setPaginationInfo] = useState({
         current: 1,
@@ -109,12 +109,12 @@ const TestAttemptList = () => {
     };
 
     const handleReset = () => {
-        setQueryParams({
+        setQueryParams(prev => ({
+            ...prev,
             page: 0,
-            size: 10,
             testTitle: '',
             userUsername: '',
-        });
+        }));
     };
 
     const showModal = (attempt = null) => {
@@ -215,26 +215,31 @@ const TestAttemptList = () => {
                     onChange={handleTableChange}
                     loading={loading}
                 >
-                    <Column title="ID" dataIndex="id" />
-                    <Column title="Тест" render={(_, a) => a.test?.title || '—'} />
-                    <Column title="Пользователь" render={(_, a) => a.user?.username || '—'} />
+                    {isAdmin && <Column title="ID" dataIndex="id" />}
+                    <Column
+                        title="Тест"
+                        render={(_, a) => a.test ? <Link to={`/tests/${a.test.id}`}>{a.test.title}</Link> : '—'}
+                    />
+                    <Column
+                        title="Пользователь"
+                        render={(_, a) => a.user?.username || '—'}
+                    />
                     <Column title="Попытка №" dataIndex="attemptNumber" />
                     <Column title="Начало" render={(_, a) => formatDateTime(a.startTime)} />
                     <Column title="Конец" render={(_, a) => formatDateTime(a.endTime)} />
                     <Column title="Балл" dataIndex="score" />
                     <Column title="Статус" render={(_, a) => translateStatus(a.status)} />
-                    <Column
-                        title="Действия"
-                        render={(_, attempt) => {
-                            if (!isAdmin) return null;
-                            return (
+                    {isAdmin && (
+                        <Column
+                            title="Действия"
+                            render={(_, attempt) => (
                                 <Space>
                                     <Button icon={<EditOutlined />} onClick={() => showModal(attempt)} />
                                     <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(attempt.id)} />
                                 </Space>
-                            );
-                        }}
-                    />
+                            )}
+                        />
+                    )}
                 </Table>
 
                 <Modal

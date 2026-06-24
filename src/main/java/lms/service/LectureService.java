@@ -1,5 +1,7 @@
 package lms.service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import lms.dto.create.LectureCreateDto;
 import lms.dto.update.LectureUpdateDto;
@@ -32,8 +34,15 @@ public class LectureService {
                 .orElseThrow(() -> new NotFoundException("Лекция с ID " + id + " не найдена"));
     }
 
-    public Page<Lecture> getFilteredLectures(String title, Integer courseId, Pageable pageable) {
-        return lectureRepository.findByFilters(title, courseId, pageable);
+    public Page<Lecture> getFilteredLectures(String title, Integer courseId,
+                                             Integer userId, String roles,
+                                             Pageable pageable) {
+        List<String> roleList = roles != null ? Arrays.asList(roles.split(",")) :
+                Collections.emptyList();
+        boolean isAdmin = roles != null && roles.contains("ADMIN");
+        boolean isTeacher = roles != null && roles.contains("TEACHER");
+        return lectureRepository.findLecturesByFiltersAndUser(title, courseId, isAdmin,
+                isTeacher, userId, roleList, pageable);
     }
 
     public List<Lecture> getAllLecturesList() {

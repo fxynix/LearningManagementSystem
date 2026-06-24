@@ -1,5 +1,6 @@
 package lms.repository;
 
+import java.util.List;
 import lms.model.Course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,23 +9,41 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 
-    @Query(value = "SELECT c.* FROM courses c "
-            + "LEFT JOIN categories cat ON c.category_id = cat.id "
-            + "LEFT JOIN users u ON c.teacher_id = u.id "
-            + "WHERE (:title IS NULL OR CAST(c.title AS TEXT) ILIKE CONCAT('%', :title, '%')) "
+    @Query(value = "SELECT DISTINCT c.* FROM courses c "
+            + "LEFT JOIN course_roles cr ON c.id = cr.course_id "
+            + "LEFT JOIN roles r ON cr.role_id = r.id "
+            + "WHERE (:title IS NULL OR CAST(c.title AS TEXT) ILIKE "
+            + "       CONCAT('%', CAST(:title AS TEXT), '%')) "
             + "AND (:categoryId IS NULL OR c.category_id = :categoryId) "
-            + "AND (:teacherId IS NULL OR c.teacher_id = :teacherId)",
-            countQuery = "SELECT COUNT(*) FROM courses c "
-                    + "WHERE (:title IS NULL OR "
-                    + "CAST(c.title AS TEXT) ILIKE CONCAT('%', :title, '%')) "
+            + "AND (:teacherId IS NULL OR c.teacher_id = :teacherId) "
+            + "AND ( "
+            + "    (:isAdmin = TRUE) "
+            + "    OR (:isTeacher = TRUE AND c.teacher_id = :userId) "
+            + "    OR (r.name IN (:roles)) "
+            + ")",
+            countQuery = "SELECT COUNT(DISTINCT c.id) FROM courses c "
+                    + "LEFT JOIN course_roles cr ON c.id = cr.course_id "
+                    + "LEFT JOIN roles r ON cr.role_id = r.id "
+                    + "WHERE (:title IS NULL OR CAST(c.title AS TEXT) ILIKE "
+                    + "       CONCAT('%', CAST(:title AS TEXT), '%')) "
                     + "AND (:categoryId IS NULL OR c.category_id = :categoryId) "
-                    + "AND (:teacherId IS NULL OR c.teacher_id = :teacherId)",
+                    + "AND (:teacherId IS NULL OR c.teacher_id = :teacherId) "
+                    + "AND ( "
+                    + "    (:isAdmin = TRUE) "
+                    + "    OR (:isTeacher = TRUE AND c.teacher_id = :userId) "
+                    + "    OR (r.name IN (:roles)) "
+                    + ")",
             nativeQuery = true)
-    Page<Course> findByFilters(@Param("title") String title,
-                               @Param("categoryId") Integer categoryId,
-                               @Param("teacherId") Integer teacherId,
-                               Pageable pageable);
+    Page<Course> findCoursesByFiltersAndUser(@Param("title") String title,
+                                             @Param("categoryId") Integer categoryId,
+                                             @Param("teacherId") Integer teacherId,
+                                             @Param("isAdmin") boolean isAdmin,
+                                             @Param("isTeacher") boolean isTeacher,
+                                             @Param("userId") Integer userId,
+                                             @Param("roles") List<String> roles,
+                                             Pageable pageable);
 }

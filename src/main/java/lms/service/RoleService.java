@@ -5,7 +5,9 @@ import lms.dto.create.RoleCreateDto;
 import lms.dto.update.RoleUpdateDto;
 import lms.exception.NotFoundException;
 import lms.model.Role;
+import lms.model.User;
 import lms.repository.RoleRepository;
+import lms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public RoleService(RoleRepository roleRepository) {
+    public RoleService(RoleRepository roleRepository, UserRepository userRepository) {
         this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
     }
 
     public Page<Role> getAllRoles(Pageable pageable) {
@@ -29,6 +33,10 @@ public class RoleService {
 
     public Page<Role> getRolesByName(String name, Pageable pageable) {
         return roleRepository.findByNameContaining(name, pageable);
+    }
+
+    public List<User> getUsersByRole(Integer roleId) {
+        return userRepository.findUsersByRoleId(roleId);
     }
 
     public List<Role> getAllRolesList() {

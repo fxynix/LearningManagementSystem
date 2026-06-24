@@ -1,5 +1,7 @@
 package lms.service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import lms.dto.create.TestAttemptCreateDto;
 import lms.dto.update.TestAttemptUpdateDto;
@@ -33,10 +35,17 @@ public class TestAttemptService {
         this.userRepository = userRepository;
     }
 
-    public Page<TestAttempt> getFilteredAttempts(Integer testId, Integer userId, String testTitle,
-                                                 String userUsername, Pageable pageable) {
-        return testAttemptRepository.findByFilters(testId, userId, testTitle,
-                userUsername, pageable);
+
+    public Page<TestAttempt> getFilteredAttempts(Integer testId, Integer userId,
+                                                 String testTitle, String userUsername,
+                                                 Integer currentUserId, String roles,
+                                                 Pageable pageable) {
+        List<String> roleList = roles != null ? Arrays.asList(roles.split(",")) :
+                Collections.emptyList();
+        boolean isAdmin = roles != null && roles.contains("ADMIN");
+        boolean isTeacher = roles != null && roles.contains("TEACHER");
+        return testAttemptRepository.findAttemptsByFiltersAndUser(testId, userId, testTitle,
+                userUsername, isAdmin, isTeacher, currentUserId, roleList, pageable);
     }
 
     public List<TestAttempt> getAllTestAttemptsList() {

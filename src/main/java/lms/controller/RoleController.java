@@ -9,6 +9,7 @@ import java.util.List;
 import lms.dto.create.RoleCreateDto;
 import lms.dto.update.RoleUpdateDto;
 import lms.model.Role;
+import lms.model.User;
 import lms.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,6 +62,13 @@ public class RoleController {
         } else {
             return ResponseEntity.ok(roleService.getAllRoles(pageable));
         }
+    }
+
+    @GetMapping("/{id}/users")
+    @Operation(summary = "Получить всех пользователей с данной ролью")
+    @ApiResponse(responseCode = "200", description = "Пользователи найдены")
+    public ResponseEntity<List<User>> getUsersByRole(@PathVariable Integer id) {
+        return ResponseEntity.ok(roleService.getUsersByRole(id));
     }
 
     @GetMapping("/all")

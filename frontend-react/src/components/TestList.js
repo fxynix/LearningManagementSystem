@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    Table, Button, Space, Modal, Form, Input, InputNumber, Select, message, Spin
-} from 'antd';
+import { Table, Button, Space, Modal, Form, Input, InputNumber, Select, message, Spin } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { getTests, createTest, updateTest, deleteTest } from '../api/testApi';
 import { getAllCourses } from '../api/courseApi';
 import { formatDateTime } from '../utils/dateUtils';
@@ -28,6 +27,8 @@ const TestList = () => {
         size: 10,
         title: '',
         courseId: undefined,
+        userId: user.id,
+        roles: user.roles ? user.roles.join(',') : '',
     });
     const [paginationInfo, setPaginationInfo] = useState({
         current: 1,
@@ -102,12 +103,12 @@ const TestList = () => {
     };
 
     const handleReset = () => {
-        setQueryParams({
+        setQueryParams(prev => ({
+            ...prev,
             page: 0,
-            size: 10,
             title: '',
             courseId: undefined,
-        });
+        }));
     };
 
     const showModal = (test = null) => {
@@ -218,24 +219,32 @@ const TestList = () => {
                     onChange={handleTableChange}
                     loading={loading}
                 >
-                    <Column title="ID" dataIndex="id" />
-                    <Column title="Название" dataIndex="title" />
-                    <Column title="Курс" render={(_, t) => t.course?.title || '—'} />
+                    {isAdmin && <Column title="ID" dataIndex="id" />}
+                    <Column
+                        title="Название"
+                        render={(_, t) => <Link to={`/tests/${t.id}`}>{t.title}</Link>}
+                    />
+                    <Column
+                        title="Курс"
+                        render={(_, t) => t.course ? <Link to={`/courses/${t.course.id}`}>{t.course.title}</Link> : '—'}
+                    />
                     <Column title="Вопросов" dataIndex="questionsCount" />
                     <Column title="Дата начала" render={(_, t) => formatDateTime(t.startDate)} />
                     <Column title="Дата окончания" render={(_, t) => formatDateTime(t.endDate)} />
-                    <Column
-                        title="Действия"
-                        render={(_, test) => {
-                            if (!canEdit(test)) return null;
-                            return (
-                                <Space>
-                                    <Button icon={<EditOutlined />} onClick={() => showModal(test)} />
-                                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(test.id)} />
-                                </Space>
-                            );
-                        }}
-                    />
+                    {(isAdmin || isTeacher) && (
+                        <Column
+                            title="Действия"
+                            render={(_, test) => {
+                                if (!canEdit(test)) return null;
+                                return (
+                                    <Space>
+                                        <Button icon={<EditOutlined />} onClick={() => showModal(test)} />
+                                        <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(test.id)} />
+                                    </Space>
+                                );
+                            }}
+                        />
+                    )}
                 </Table>
 
                 <Modal

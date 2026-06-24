@@ -6,6 +6,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getUsers, createUser, updateUser, deleteUser } from '../api/userApi';
 import { getAllRoles } from '../api/roleApi';
 import { useAuth } from '../context/AuthContext';
+import {Link} from "react-router-dom";
 
 const { Column } = Table;
 const { Option } = Select;
@@ -195,7 +196,9 @@ const UserList = () => {
                         render={(_, user) => (
                             <Space wrap>
                                 {user.roles?.map(role => (
-                                    <Tag key={role.id} color="blue">{role.name}</Tag>
+                                    <Link key={role.id} to={`/roles/${role.id}`}>
+                                        <Tag key={role.id} color="blue">{role.name}</Tag>
+                                    </Link>
                                 )) || '—'}
                             </Space>
                         )}

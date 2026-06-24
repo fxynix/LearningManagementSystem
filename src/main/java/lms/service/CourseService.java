@@ -1,5 +1,7 @@
 package lms.service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,8 +52,13 @@ public class CourseService {
     }
 
     public Page<Course> getFilteredCourses(String title, Integer categoryId, Integer teacherId,
-                                           Pageable pageable) {
-        return courseRepository.findByFilters(title, categoryId, teacherId, pageable);
+                                           Integer userId, String roles, Pageable pageable) {
+        List<String> roleList = roles != null ? Arrays.asList(roles.split(",")) :
+                Collections.emptyList();
+        boolean isAdmin = roles != null && roles.contains("ADMIN");
+        boolean isTeacher = roles != null && roles.contains("TEACHER");
+        return courseRepository.findCoursesByFiltersAndUser(title, categoryId, teacherId,
+                isAdmin, isTeacher, userId, roleList, pageable);
     }
 
     public List<Course> getAllCoursesList() {

@@ -50,15 +50,20 @@ public class TestController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить тесты с пагинацией и фильтрацией")
+    @Operation(summary = "Получить тесты с пагинацией и фильтрацией с учётом прав пользователя")
     @ApiResponse(responseCode = "200", description = "Тесты найдены")
     public ResponseEntity<Page<Test>> getTests(
             @Parameter(description = "Название (частичное совпадение)")
             @RequestParam(required = false) String title,
-            @Parameter(description = "ID курса")
+            @Parameter(description = "ID курса (фильтр)")
             @RequestParam(required = false) Integer courseId,
+            @Parameter(description = "ID текущего пользователя")
+            @RequestParam(required = false) Integer userId,
+            @Parameter(description = "Список ролей пользователя (через запятую)")
+            @RequestParam(required = false) String roles,
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.ok(testService.getFilteredTests(title, courseId, pageable));
+        Page<Test> tests = testService.getFilteredTests(title, courseId, userId, roles, pageable);
+        return ResponseEntity.ok(tests);
     }
 
     @GetMapping("/all")

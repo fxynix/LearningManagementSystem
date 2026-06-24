@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    Table, Button, Space, Modal, Form, Input, message, Spin
-} from 'antd';
+import { Table, Button, Space, Modal, Form, Input, message, Spin } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../api/categoryApi';
 import { useAuth } from '../context/AuthContext';
 
@@ -10,6 +9,9 @@ const { Column } = Table;
 
 const CategoryList = () => {
     const { user } = useAuth();
+    const isAdmin = user.roles?.includes('ADMIN') || false;
+    const isTeacher = user.roles?.includes('TEACHER') || false;
+    const canManage = isAdmin || isTeacher;
 
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -33,10 +35,6 @@ const CategoryList = () => {
     useEffect(() => {
         fetchCategories();
     }, [queryParams]);
-
-    const isAdmin = user.roles?.includes('ADMIN') || false;
-    const isTeacher = user.roles?.includes('TEACHER') || false;
-    const canManage = isAdmin || isTeacher;
 
     const fetchCategories = async () => {
         setLoading(true);
@@ -182,21 +180,25 @@ const CategoryList = () => {
                     onChange={handleTableChange}
                     loading={loading}
                 >
-                    <Column title="ID" dataIndex="id" />
-                    <Column title="Название" dataIndex="name" />
-                    <Column title="Описание" dataIndex="description" />
+                    {isAdmin && <Column title="ID" dataIndex="id" />}
                     <Column
-                        title="Действия"
-                        render={(_, category) => {
-                            if (!canManage) return null;
-                            return (
+                        title="Название"
+                        render={(_, category) => (
+                            <Link to={`/categories/${category.id}`}>{category.name}</Link>
+                        )}
+                    />
+                    <Column title="Описание" dataIndex="description" />
+                    {canManage && (
+                        <Column
+                            title="Действия"
+                            render={(_, category) => (
                                 <Space>
                                     <Button icon={<EditOutlined />} onClick={() => showModal(category)} />
                                     <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(category.id)} />
                                 </Space>
-                            );
-                        }}
-                    />
+                            )}
+                        />
+                    )}
                 </Table>
 
                 <Modal

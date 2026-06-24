@@ -51,20 +51,25 @@ public class TestAttemptController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить попытки с пагинацией и фильтрацией")
+    @Operation(summary = "Получить попытки с пагинацией и фильтрацией с учётом прав пользователя")
     @ApiResponse(responseCode = "200", description = "Попытки найдены")
     public ResponseEntity<Page<TestAttempt>> getTestAttempts(
-            @Parameter(description = "ID теста")
+            @Parameter(description = "ID теста (фильтр)")
             @RequestParam(required = false) Integer testId,
-            @Parameter(description = "ID пользователя")
+            @Parameter(description = "ID пользователя (фильтр)")
             @RequestParam(required = false) Integer userId,
-            @Parameter(description = "Название теста")
-            @RequestParam(required = false) String  testTitle,
-            @Parameter(description = "Логин пользователя")
+            @Parameter(description = "Название теста (частичное совпадение)")
+            @RequestParam(required = false) String testTitle,
+            @Parameter(description = "Логин пользователя (частичное совпадение)")
             @RequestParam(required = false) String userUsername,
+            @Parameter(description = "ID текущего пользователя (для проверки прав)")
+            @RequestParam(required = false) Integer currentUserId,
+            @Parameter(description = "Список ролей пользователя (через запятую)")
+            @RequestParam(required = false) String roles,
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.ok(testAttemptService.getFilteredAttempts(testId, userId, testTitle,
-                userUsername, pageable));
+        Page<TestAttempt> attempts = testAttemptService.getFilteredAttempts(testId, userId,
+                testTitle, userUsername, currentUserId, roles, pageable);
+        return ResponseEntity.ok(attempts);
     }
 
     @GetMapping("/all")
