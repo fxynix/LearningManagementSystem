@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TestAttemptRepository extends JpaRepository<TestAttempt, Integer> {
 
+    @SuppressWarnings("squid:S107")
     @Query(value = "SELECT ta.* FROM test_attempts ta "
             + "LEFT JOIN tests t ON ta.test_id = t.id "
             + "LEFT JOIN courses c ON t.course_id = c.id "

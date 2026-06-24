@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 
+    @SuppressWarnings("squid:S107")
     @Query(value = "SELECT DISTINCT c.* FROM courses c "
             + "LEFT JOIN course_roles cr ON c.id = cr.course_id "
             + "LEFT JOIN roles r ON cr.role_id = r.id "
