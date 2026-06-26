@@ -1,0 +1,14 @@
+<div class="container">
+    <div class="back-row">
+        <button nz-button nzType="default" (click)="goBack()">
+            <i nz-icon nzType="arrow-left"></i> Назад
+        </button>
+        <hr class="flex-divider" />
+    </div>
+    <nz-spin [nzSpinning]="loading" [nzTip]="'Загрузка...'">
+        <div *ngIf="lecture">
+            <h2>{{ lecture.title }}</h2>
+            <div [innerHTML]="decodedContent"></div>
+        </div>
+    </nz-spin>
+</div>

@@ -1,0 +1,21 @@
+<div class="container">
+    <div class="back-row">
+        <button nz-button nzType="default" (click)="goBack()">
+            <i nz-icon nzType="arrow-left"></i> Назад
+        </button>
+        <hr class="flex-divider" />
+    </div>
+    <nz-spin [nzSpinning]="loading" [nzTip]="'Загрузка...'">
+        <div *ngIf="role">
+            <h2>Роль: {{ role.name }}</h2>
+            <p>{{ role.description }}</p>
+            <h4>Пользователи с этой ролью ({{ users.length }})</h4>
+            <nz-list *ngIf="users.length > 0; else noUsers">
+                <nz-list-item *ngFor="let user of users; let i = index">
+                    {{ i + 1 }}. {{ user.username }} ({{ user.fullName || user.username }})
+                </nz-list-item>
+            </nz-list>
+            <ng-template #noUsers><p>Нет пользователей</p></ng-template>
+        </div>
+    </nz-spin>
+</div>

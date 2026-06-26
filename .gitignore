@@ -5,9 +5,11 @@ target/
 
 .env
 !frontend-react/.env
-
 *.iml
 frontend-react/node_modules/
+frontend-angular/node_modules
+frontend-angular/.angular
+
 ### IntelliJ IDEA ###
 .idea
 out/

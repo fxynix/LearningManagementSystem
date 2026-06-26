@@ -1,0 +1,13 @@
+.container {
+  padding: 24px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.actions .add-btn {
+  margin-left: auto;
+}

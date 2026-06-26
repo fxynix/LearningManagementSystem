@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="back-row">
+        <button nz-button nzType="default" (click)="goBack()">
+            <i nz-icon nzType="arrow-left"></i> Назад
+        </button>
+        <hr class="flex-divider" />
+    </div>
+    <nz-spin [nzSpinning]="loading" [nzTip]="'Загрузка...'">
+        <div *ngIf="course">
+            <h2>{{ course.title }}</h2>
+            <p><strong>Преподаватель:</strong> {{ course.teacher?.fullName || 'Не указан' }}</p>
+            <p>{{ course.description }}</p>
+
+            <h4>Лекции</h4>
+            <nz-list *ngIf="lectures.length > 0; else noLectures">
+                <nz-list-item *ngFor="let lecture of lectures">
+                    <a [routerLink]="['/lectures', lecture.id]">{{ lecture.title }}</a>
+                </nz-list-item>
+            </nz-list>
+            <ng-template #noLectures><p>Нет лекций</p></ng-template>
+
+            <h4>Тесты</h4>
+            <nz-list *ngIf="tests.length > 0; else noTests">
+                <nz-list-item *ngFor="let test of tests">
+                    <a [routerLink]="['/tests', test.id]">{{ test.title }}</a>
+                </nz-list-item>
+            </nz-list>
+            <ng-template #noTests><p>Нет тестов</p></ng-template>
+        </div>
+    </nz-spin>
+</div>

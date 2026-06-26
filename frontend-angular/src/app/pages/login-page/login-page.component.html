@@ -1,0 +1,25 @@
+<div class="login-container">
+    <nz-card nzTitle="Вход в LMS" style="width:400px;">
+        <form nz-form [formGroup]="loginForm" (ngSubmit)="submitForm()">
+            <nz-form-item>
+                <nz-form-label [nzSpan]="24">Логин</nz-form-label>
+                <nz-form-control [nzSpan]="24" [nzErrorTip]="'Обязательное поле'">
+                    <input nz-input formControlName="username" placeholder="Введите логин" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label [nzSpan]="24">Пароль</nz-form-label>
+                <nz-form-control [nzSpan]="24" [nzErrorTip]="'Обязательное поле'">
+                    <input nz-input type="password" formControlName="password" placeholder="Введите пароль" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-control [nzSpan]="24">
+                    <button nz-button nzType="primary" htmlType="submit" [nzLoading]="loading" block>
+                        Войти
+                    </button>
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+    </nz-card>
+</div>

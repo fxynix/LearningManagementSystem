@@ -1,0 +1,46 @@
+<nz-layout *ngIf="auth.getUser(); else loginTemplate">
+    <nz-header>
+        <div class="logo">
+            <a routerLink="/">
+                <img src="/favicon.ico" alt="LMS" style="height:28px;margin-right:10px" />
+                <span style="color:#fff;font-size:20px">LMS</span>
+            </a>
+        </div>
+        <ul nz-menu nzTheme="dark" nzMode="horizontal">
+            <li nz-menu-item routerLink="/" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{exact: true}">
+                <i nz-icon nzType="home"></i>Главная
+            </li>
+            <li nz-menu-item *ngIf="auth.isAdmin()" routerLink="/users" routerLinkActive="ant-menu-item-selected">
+                <i nz-icon nzType="user"></i>Пользователи
+            </li>
+            <li nz-menu-item *ngIf="auth.isAdmin()" routerLink="/roles" routerLinkActive="ant-menu-item-selected">
+                <i nz-icon nzType="team"></i>Роли
+            </li>
+            <li nz-menu-item *ngIf="auth.isAdmin() || auth.isTeacher()" routerLink="/categories" routerLinkActive="ant-menu-item-selected">
+                <i nz-icon nzType="appstore"></i>Категории
+            </li>
+            <li nz-menu-item *ngIf="auth.isAdmin() || auth.isTeacher()" routerLink="/courses" routerLinkActive="ant-menu-item-selected">
+                <i nz-icon nzType="book"></i>Курсы
+            </li>
+            <li nz-menu-item *ngIf="auth.isAdmin() || auth.isTeacher()" routerLink="/lectures" routerLinkActive="ant-menu-item-selected">
+                <i nz-icon nzType="file-text"></i>Лекции
+            </li>
+            <li nz-menu-item *ngIf="auth.isAdmin() || auth.isTeacher()" routerLink="/tests" routerLinkActive="ant-menu-item-selected">
+                <i nz-icon nzType="check-circle"></i>Тесты
+            </li>
+            <li nz-menu-item routerLink="/attempts" routerLinkActive="ant-menu-item-selected">
+                <i nz-icon nzType="solution"></i>Попытки
+            </li>
+        </ul>
+        <div class="user-info">
+            <span>{{ auth.getUser()?.username }} ({{ auth.getUser()?.roleDescription }})</span>
+            <button nz-button nzType="link" (click)="logout()" style="color:#fff">Выйти</button>
+        </div>
+    </nz-header>
+    <nz-content>
+        <router-outlet></router-outlet>
+    </nz-content>
+</nz-layout>
+<ng-template #loginTemplate>
+    <router-outlet></router-outlet>
+</ng-template>

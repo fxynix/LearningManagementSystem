@@ -1,0 +1,20 @@
+<div class="container">
+    <button nz-button nzType="default" (click)="goBack()" style="margin-bottom:16px;">
+        <i nz-icon nzType="arrow-left"></i> Назад
+    </button>
+    <nz-spin [nzSpinning]="loading" [nzTip]="'Загрузка...'">
+        <div *ngIf="category">
+            <h2>{{ category.name }}</h2>
+            <p>{{ category.description }}</p>
+            <h4>Курсы в этой категории</h4>
+            <nz-list *ngIf="courses.length > 0; else noCourses" [nzGrid]="{ gutter: 16, column: 3 }">
+                <nz-list-item *ngFor="let course of courses">
+                    <nz-card [nzTitle]="course.title" (click)="navigateToCourse(course.id)" nzHoverable>
+                        {{ course.description }}
+                    </nz-card>
+                </nz-list-item>
+            </nz-list>
+            <ng-template #noCourses><p>В этой категории нет курсов</p></ng-template>
+        </div>
+    </nz-spin>
+</div>

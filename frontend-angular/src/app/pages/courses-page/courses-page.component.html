@@ -1,0 +1,23 @@
+<div class="container">
+    <h2>Доступные курсы</h2>
+    <nz-spin [nzSpinning]="loading" [nzTip]="'Загрузка...'">
+        <div *ngIf="!loading && courses.length === 0">
+            <p>Нет доступных курсов</p>
+        </div>
+        <nz-collapse *ngIf="!loading && courses.length > 0">
+            <nz-collapse-panel
+                    *ngFor="let category of groupedCourses | keyvalue; trackBy: trackByCategory"
+                    [nzHeader]="category.key"
+                    [nzActive]="true">
+                <nz-list [nzGrid]="{ gutter: 16, column: 3 }">
+                    <nz-list-item *ngFor="let course of category.value; trackBy: trackByCourse">
+                        <nz-card [nzTitle]="course.title" (click)="navigateToCourse(course.id)" nzHoverable>
+                            <p>{{ course.description }}</p>
+                            <p><strong>Преподаватель:</strong> {{ course.teacher?.fullName || 'Не указан' }}</p>
+                        </nz-card>
+                    </nz-list-item>
+                </nz-list>
+            </nz-collapse-panel>
+        </nz-collapse>
+    </nz-spin>
+</div>

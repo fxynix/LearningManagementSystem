@@ -1,0 +1,18 @@
+<div class="container">
+    <div class="back-row">
+        <button nz-button nzType="default" (click)="goBack()">
+            <i nz-icon nzType="arrow-left"></i> Назад
+        </button>
+        <hr class="flex-divider" />
+    </div>
+    <nz-spin [nzSpinning]="loading" [nzTip]="'Загрузка...'">
+        <div *ngIf="test">
+            <h2>{{ test.title }}</h2>
+            <p>{{ test.description }}</p>
+            <p><strong>Вопросов:</strong> {{ test.questionsCount }}</p>
+            <button nz-button nzType="primary" (click)="startTest()">
+                <i nz-icon nzType="play-circle"></i> Пройти тест
+            </button>
+        </div>
+    </nz-spin>
+</div>
