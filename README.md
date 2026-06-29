@@ -32,7 +32,7 @@ $$
 
 ## Sonar Cloud
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fxynix_LearningManagementSystem)](https://sonarcloud.io/summary/new_code?id=fxynix_LearningManagementSystem)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fxynix_LearningManagementSystem&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=fxynix_LearningManagementSystem)
 
 [Sonar](https://sonarcloud.io/project/overview?id=fxynix_LearningManagementSystem)
 
