@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: lms-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: lms-backend
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+
+  react:
+    build:
+      context: .
+      dockerfile: Dockerfile.react
+    container_name: lms-react
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: on-failure
+
+  angular:
+    build:
+      context: .
+      dockerfile: Dockerfile.angular
+    container_name: lms-angular
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    restart: on-failure
+
+volumes:
+  postgres_data:
