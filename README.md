@@ -34,7 +34,7 @@ $$
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fxynix_LearningManagementSystem&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=fxynix_LearningManagementSystem)
 
-[Sonar](https://sonarcloud.io/project/overview?id=fxynix_LearningManagementSystem)
+Посмотреть [Sonar](https://sonarcloud.io/project/overview?id=fxynix_LearningManagementSystem)
 
 ---
 
@@ -44,7 +44,7 @@ $$
    ```bash
    copy .env.example .env
    ```
-2. Задать переменные окружения в `.env`;
+2. Задать переменные окружения в `.env`
 3. Поднять проект:
    ```bash
    docker-compose up --build
